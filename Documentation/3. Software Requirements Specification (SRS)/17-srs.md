@@ -24,4 +24,4 @@ The system is a web-based tool that allows users to record income/expenses, view
 
 ## 6. Constraints
 - System requires an active internet connection to save data.
-- Data is stored in a centralized database (Cloud/Local PostgreSQL).
+- Data is stored in a MongoDB NoSQL database (Local instance or Cloud MongoDB Atlas).

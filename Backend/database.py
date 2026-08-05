@@ -1,28 +1,18 @@
-# In-memory storage instead of full SQL/NoSQL database
+import os
+from pymongo import MongoClient, ReturnDocument
 
-# Global in-memory lists/dicts as mock storage
-users = {}      # email -> User
-expenses = []   # list of Expense
+MONGO_URI = os.getenv("MONGO_URI", "mongodb://localhost:27017/")
+client = MongoClient(MONGO_URI)
+db = client["expense_tracker"]
 
-# ID counters
-_user_id_counter = 1
-_expense_id_counter = 1
-
-def next_user_id() -> int:
-    global _user_id_counter
-    uid = _user_id_counter
-    _user_id_counter += 1
-    return uid
-
-def next_expense_id() -> int:
-    global _expense_id_counter
-    eid = _expense_id_counter
-    _expense_id_counter += 1
-    return eid
-
-def get_db():
+def get_next_sequence_value(sequence_name: str) -> int:
     """
-    Keep function signature for dependency injection in routes
-    but yield None as there is no real database connection session.
+    Atomically increments and returns a sequential integer ID for collections.
     """
-    yield None
+    result = db["counters"].find_one_and_update(
+        {"_id": sequence_name},
+        {"$inc": {"sequence_value": 1}},
+        upsert=True,
+        return_document=ReturnDocument.AFTER
+    )
+    return result["sequence_value"]

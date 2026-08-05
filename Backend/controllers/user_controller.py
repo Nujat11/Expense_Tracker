@@ -1,6 +1,5 @@
 import bcrypt
-import database
-from models.user import User
+from database import db, get_next_sequence_value
 from schemas.user import UserCreate
 
 def get_password_hash(password: str) -> str:
@@ -11,12 +10,18 @@ def get_password_hash(password: str) -> str:
 def verify_password(plain_password: str, hashed_password: str) -> bool:
     return bcrypt.checkpw(plain_password.encode('utf-8'), hashed_password.encode('utf-8'))
 
-def get_user_by_email(db, email: str):
-    return database.users.get(email)
+def get_user_by_email(email: str):
+    user = db["users"].find_one({"email": email})
+    return user
 
-def create_user(db, user: UserCreate):
+def create_user(user: UserCreate):
     hashed_password = get_password_hash(user.password)
-    u_id = database.next_user_id()
-    db_user = User(id=u_id, name=user.name, email=user.email, password=hashed_password)
-    database.users[user.email] = db_user
-    return db_user
+    user_id = get_next_sequence_value("user_id")
+    user_dict = {
+        "id": user_id,
+        "name": user.name,
+        "email": user.email,
+        "password": hashed_password
+    }
+    db["users"].insert_one(user_dict)
+    return user_dict

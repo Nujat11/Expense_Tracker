@@ -4,10 +4,10 @@
 This document provides the technical roadmap for building the **Personal Expense Tracker**. It covers the architecture, data models, and API definitions.
 
 ## 2. Technology Choices
-- **Frontend Stack:** React, CSS, Chart.js (for visualization).
-- **Backend Stack:** Python, FastAPI, SQLAlchemy (ORM).
-- **Database:** PostgreSQL.
-- **Hosting (Planned):** Vercel (Frontend) and Render/Heroku (Backend).
+- **Frontend Stack:** React, CSS, Recharts (for visualization).
+- **Backend Stack:** Python, FastAPI, PyMongo (NoSQL client).
+- **Database:** MongoDB (NoSQL Database).
+- **Hosting:** Netlify (Frontend) and Render (Backend).
 
 ## 3. Design Principles
 - **Clean API:** Strictly RESTful endpoints with consistent JSON responses.
