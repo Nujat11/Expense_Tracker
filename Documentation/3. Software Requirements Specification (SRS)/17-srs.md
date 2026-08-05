@@ -24,4 +24,8 @@ The system is a web-based tool that allows users to record income/expenses, view
 
 ## 6. Constraints
 - System requires an active internet connection to save data.
+<<<<<<< HEAD
+- Data is stored in a MongoDB NoSQL database (Local instance or Cloud MongoDB Atlas).
+=======
 - Data is stored locally on the server in a structured JSON database file (`data.json`) managed by `store.py`.
+>>>>>>> main

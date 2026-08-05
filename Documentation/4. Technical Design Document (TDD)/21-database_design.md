@@ -1,7 +1,12 @@
 # 21 - Database Design
 
+<<<<<<< HEAD
+## MongoDB Collections (NoSQL Database)
+The application uses MongoDB to store all documents in structured collections.
+=======
 ## JSON Storage Format (`data.json`)
 The application uses a local JSON file to store all records in structured arrays.
+>>>>>>> main
 
 ### Entity: `users`
 Stores user profile information.

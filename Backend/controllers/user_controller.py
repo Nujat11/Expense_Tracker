@@ -1,5 +1,5 @@
 import bcrypt
-from store import store
+from database import db, get_next_sequence_value
 from schemas.user import UserCreate
 
 def get_password_hash(password: str) -> str:
@@ -11,20 +11,17 @@ def verify_password(plain_password: str, hashed_password: str) -> bool:
     return bcrypt.checkpw(plain_password.encode('utf-8'), hashed_password.encode('utf-8'))
 
 def get_user_by_email(email: str):
-    for u in store.users:
-        if u.get("email") == email:
-            return u
-    return None
+    user = db["users"].find_one({"email": email})
+    return user
 
 def create_user(user: UserCreate):
     hashed_password = get_password_hash(user.password)
+    user_id = get_next_sequence_value("user_id")
     user_dict = {
-        "id": store.user_id_counter,
+        "id": user_id,
         "name": user.name,
         "email": user.email,
         "password": hashed_password
     }
-    store.user_id_counter += 1
-    store.users.append(user_dict)
-    store.save_data()
+    db["users"].insert_one(user_dict)
     return user_dict

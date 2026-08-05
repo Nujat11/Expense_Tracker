@@ -11,17 +11,29 @@ graph TD
         Router[Routers / Controllers]
         Schema[Pydantic / Views]
         CRUD[CRUD Operations / Logic]
+<<<<<<< HEAD
+        PyMongo[PyMongo Client / database.py]
+    end
+    subgraph Data_Layer
+        DB[(MongoDB Database)]
+=======
         Store[JSON Data Store Helper]
     end
     subgraph Data_Layer
         DB[(data.json File)]
+>>>>>>> main
     end
 
     Web -- "HTTP/JSON" --> Router
     Router -- "Validates with" --> Schema
     Router -- "Calls" --> CRUD
+<<<<<<< HEAD
+    CRUD -- "Uses" --> PyMongo
+    PyMongo -- "MongoDB driver" --> DB
+=======
     CRUD -- "Uses" --> Store
     Store -- "File Read/Write" --> DB
+>>>>>>> main
 ```
 
 ### Components:
@@ -29,6 +41,11 @@ graph TD
 2. **Backend (FastAPI - MVC Pattern):** 
    - **Controllers (Routers):** Handles incoming HTTP requests and directs them to business logic controller methods.
    - **Views (Schemas):** Validates and serializes HTTP request and response structures using Pydantic schemas.
+<<<<<<< HEAD
+   - **CRUD / Database Logic:** Manages database persistence layer operations using PyMongo client collections and helper sequence generators.
+3. **Database (MongoDB):** Stores users, expenses, and ID counter collections persistently.
+=======
    - **CRUD / Store Logic:** Manages transaction registers and user data entries in memory and persists them using `store.py`.
 3. **Database (data.json):** A local JSON file database that persists user and transaction records in standard structured arrays.
+>>>>>>> main
 4. **Authentication:** Uses hashed passwords (via `bcrypt` hashing) on registration/login and persists authenticated user details in the client browser's `localStorage` session.

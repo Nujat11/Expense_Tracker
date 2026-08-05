@@ -1,34 +1,36 @@
-from store import store
+from database import db, get_next_sequence_value
 from schemas.expense import ExpenseCreate, ExpenseUpdate
 
 def get_expenses_by_user(user_id: int):
-    return [e for e in store.expenses if e.get("user_id") == user_id]
+    # Retrieve all expenses for the user and exclude MongoDB's _id field
+    expenses = list(db["expenses"].find({"user_id": user_id}, {"_id": 0}))
+    return expenses
 
 def create_expense(expense: ExpenseCreate):
+    expense_id = get_next_sequence_value("expense_id")
+    # Use mode="json" to serialize datetime.date into ISO string for MongoDB storage
     exp_dict = {
-        "id": store.expense_id_counter,
-        **expense.model_dump()
+        "id": expense_id,
+        **expense.model_dump(mode="json")
     }
-    store.expense_id_counter += 1
-    store.expenses.append(exp_dict)
-    store.save_data()
+    db["expenses"].insert_one(exp_dict)
+    # Remove _id if present in exp_dict before returning (pymongo adds _id in-place)
+    exp_dict.pop("_id", None)
     return exp_dict
 
 def update_expense(expense_id: int, expense: ExpenseUpdate):
-    for idx, e in enumerate(store.expenses):
-        if e.get("id") == expense_id:
-            update_data = expense.model_dump(exclude_unset=True)
-            for key, val in update_data.items():
-                if val is not None:
-                    e[key] = val
-            store.save_data()
-            return e
-    return None
+    update_data = expense.model_dump(mode="json", exclude_unset=True)
+    if not update_data:
+        return db["expenses"].find_one({"id": expense_id}, {"_id": 0})
+        
+    result = db["expenses"].find_one_and_update(
+        {"id": expense_id},
+        {"$set": update_data},
+        return_document=True,
+        projection={"_id": 0}
+    )
+    return result
 
 def delete_expense(expense_id: int):
-    for idx, e in enumerate(store.expenses):
-        if e.get("id") == expense_id:
-            store.expenses.pop(idx)
-            store.save_data()
-            return True
-    return False
+    result = db["expenses"].delete_one({"id": expense_id})
+    return result.deleted_count > 0
