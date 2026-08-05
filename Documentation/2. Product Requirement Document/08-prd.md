@@ -23,5 +23,5 @@ The **Personal Expense Tracker** is a basic web app designed to help students an
 |---|---|---|
 | **Frontend** | React | Flexible and fast user interface. |
 | **Backend** | FastAPI | High performance for data handling. |
-| **Database** | PostgreSQL | Safe and reliable data storage. |
+| **Database** | JSON File Storage | Lightweight data persistence using a local JSON file (`data.json`). |
 

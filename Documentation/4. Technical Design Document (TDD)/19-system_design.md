@@ -11,24 +11,24 @@ graph TD
         Router[Routers / Controllers]
         Schema[Pydantic / Views]
         CRUD[CRUD Operations / Logic]
-        Model[SQLAlchemy Models]
+        Store[JSON Data Store Helper]
     end
     subgraph Data_Layer
-        DB[(SQL Database)]
+        DB[(data.json File)]
     end
 
     Web -- "HTTP/JSON" --> Router
     Router -- "Validates with" --> Schema
     Router -- "Calls" --> CRUD
-    CRUD -- "Uses" --> Model
-    Model -- "ORM Queries" --> DB
+    CRUD -- "Uses" --> Store
+    Store -- "File Read/Write" --> DB
 ```
 
 ### Components:
-1. **Frontend (React):** Handles the user interface, routing, and data visualization (Pie Charts).
+1. **Frontend (React):** Handles the user interface, routing, budget settings, local storage configurations, and data visualization (Recharts Pie Charts).
 2. **Backend (FastAPI - MVC Pattern):** 
-   - **Controllers (Routers):** Handles incoming HTTP requests and routes them.
-   - **Views (Schemas):** Validates and formats the data sent and received.
-   - **Models:** Represents database tables and logic using SQLAlchemy and CRUD functions.
-3. **Database (SQLite/PostgreSQL):** Stores users and transaction history persistently.
-4. **Authentication:** Uses secure token-based session management.
+   - **Controllers (Routers):** Handles incoming HTTP requests and directs them to business logic controller methods.
+   - **Views (Schemas):** Validates and serializes HTTP request and response structures using Pydantic schemas.
+   - **CRUD / Store Logic:** Manages transaction registers and user data entries in memory and persists them using `store.py`.
+3. **Database (data.json):** A local JSON file database that persists user and transaction records in standard structured arrays.
+4. **Authentication:** Uses hashed passwords (via `bcrypt` hashing) on registration/login and persists authenticated user details in the client browser's `localStorage` session.

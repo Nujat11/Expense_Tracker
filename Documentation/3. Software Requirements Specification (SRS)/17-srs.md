@@ -24,4 +24,4 @@ The system is a web-based tool that allows users to record income/expenses, view
 
 ## 6. Constraints
 - System requires an active internet connection to save data.
-- Data is stored in a centralized database (Cloud/Local PostgreSQL).
+- Data is stored locally on the server in a structured JSON database file (`data.json`) managed by `store.py`.

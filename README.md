@@ -16,11 +16,11 @@ A modern, full-stack web application designed to help you strictly track your fi
 - **Dynamic Glassmorphism UI**: Beautiful, layered gradients and blurred panes constructed natively with React & CSS. 
 - **Full Expense CRUD functionality**: Easily Add, Edit, or Delete financial transactions cleanly tracked inside your own private namespace.
 - **Data Dashboards & Charts**: Visualize your total balance, aggregated incomes, and spending summaries inside an elegant Recharts pie chart.
-- **Auto-Generating SQLite Database**: No database environment configurations required; seamlessly builds an implicit local SQLite DB instance upon startup.
+- **Local JSON-based File Storage**: Automatically initializes and manages a local `data.json` file for lightweight, structured expense records without complex database configuration.
 
 ## 🛠️ Technology Stack
 - **Frontend Layer:** React 18, Vite, Recharts, React Router
-- **Backend Infrastructure:** Python 3.10+, FastAPI, SQLAlchemy, Gunicorn
+- **Backend Infrastructure:** Python 3.10+, FastAPI, Gunicorn, JSON Storage
 - **Deployment:** Render (Backend), Netlify (Frontend)
 - **Design Pattern:** Strict Backend MVC implementation
 
@@ -56,11 +56,10 @@ npm run dev
 
 ```
 ├── Backend/                 # Python FastAPI Application
-│   ├── controllers/         # Business Logic
-│   ├── models/              # SQLAlchemy Database Schemes
+│   ├── controllers/         # Business Logic (Handling JSON actions)
 │   ├── routes/              # Client-Facing Endpoint URLs
 │   ├── schemas/             # Pydantic Typing Validation 
-│   ├── database.py          # Session & Auto-SQL Logic
+│   ├── store.py             # JSON Database helper / controller linkage
 │   └── main.py              # Root Application & CORS
 │
 ├── Frontend/                # Vite + React Interface

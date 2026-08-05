@@ -1,24 +1,27 @@
 # 21 - Database Design
 
-## Table: `users`
-Stores user account information.
+## JSON Storage Format (`data.json`)
+The application uses a local JSON file to store all records in structured arrays.
 
-| Column | Type | Constraints |
+### Entity: `users`
+Stores user profile information.
+
+| Property | Type | Description / Constraints |
 |---|---|---|
-| `id` | Integer | Primary Key, Auto-increment |
-| `email` | String | Unique, Not Null |
-| `password_hash` | String | Not Null |
-| `created_at` | DateTime | Default: current_timestamp |
+| `id` | Integer | Unique identifier (Auto-incremented locally) |
+| `name` | String | User's full name |
+| `email` | String | User's email address (Unique constraint verified in controller) |
+| `password` | String | Salted & hashed password (via `bcrypt`) |
 
-## Table: `transactions`
+### Entity: `expenses` (Transactions)
 Stores spending and income records.
 
-| Column | Type | Constraints |
+| Property | Type | Description / Constraints |
 |---|---|---|
-| `id` | Integer | Primary Key, Auto-increment |
-| `user_id` | Integer | Foreign Key -> `users.id` |
-| `amount` | Float | Not Null |
-| `category` | String | Not Null (e.g., Food, Travel) |
-| `type` | String | Not Null (Income or Expense) |
-| `date` | Date | Not Null |
-| `notes` | Text | Optional |
+| `id` | Integer | Unique identifier (Auto-incremented locally) |
+| `user_id` | Integer | Links transaction to `users.id` |
+| `title` | String | Title or description of the transaction |
+| `amount` | Float | Transaction value (Must be non-negative) |
+| `category` | String | Category label (e.g., Food, Transport, Rent, Entertainment, Salary, Other) |
+| `type` | String | Transaction type (`Income` or `Expense`) |
+| `date` | Date | Transaction date (Format: YYYY-MM-DD) |
