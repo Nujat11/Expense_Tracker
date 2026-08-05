@@ -1,7 +1,3 @@
-databases:
-  - name: expensedb
-    plan: free
-
 services:
   - type: web
     name: expense-tracker-backend
@@ -9,10 +5,6 @@ services:
     buildCommand: pip install -r Backend/requirements.txt
     startCommand: gunicorn -k uvicorn.workers.UvicornWorker Backend.main:app --bind 0.0.0.0:$PORT
     envVars:
-      - key: DATABASE_URL
-        fromDatabase:
-          name: expensedb
-          property: connectionString
       - key: PYTHONPATH
         value: Backend
       - key: PYTHON_VERSION

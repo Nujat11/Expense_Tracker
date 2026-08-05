@@ -5,20 +5,16 @@ All API requests and responses will be in **JSON** format.
 ## Auth Endpoints
 | Method | Endpoint | Description |
 |---|---|---|
-| **POST** | `/auth/register` | Create a new user account. |
-| **POST** | `/auth/login` | Login and receive a JWT token. |
+| **POST** | `/register` | Create a new user account. Returns user details. |
+| **POST** | `/login` | Verify credentials. Returns user session details (No JWT token, session is persisted on client side). |
 
-## Transaction Endpoints (Requires Auth)
+## Expense Endpoints
 | Method | Endpoint | Description |
 |---|---|---|
-| **GET** | `/transactions` | Get all transactions for the user. |
-| **POST** | `/transactions` | Create a new transaction record. |
-| **GET** | `/transactions/{id}`| Get details of a specific transaction. |
-| **PUT** | `/transactions/{id}`| Update an existing transaction. |
-| **DELETE** | `/transactions/{id}`| Delete a transaction. |
+| **POST** | `/expenses` | Create a new transaction record. |
+| **GET** | `/expenses/{user_id}` | Get all transaction records belonging to a user ID. |
+| **PUT** | `/expenses/{expense_id}`| Update details of a specific transaction by its ID. |
+| **DELETE** | `/expenses/{expense_id}`| Delete a transaction by its ID. |
 
-## Dashboard Endpoints (Requires Auth)
-| Method | Endpoint | Description |
-|---|---|---|
-| **GET** | `/dashboard/summary`| Get current balance and budget status. |
-| **GET** | `/dashboard/charts` | Get category-wise data for Pie Charts. |
+## Dashboard & Analytics
+There are no dedicated backend endpoints for dashboard summary metrics or chart calculations. The Frontend React dashboard retrieves all transaction data via `GET /expenses/{user_id}` and calculates totals, balances, and category breakdowns dynamically in client-side memory.

@@ -1,0 +1,11 @@
+{
+  "users": [
+    {
+      "id": 1,
+      "name": "Priyo",
+      "email": "priyo@gmail.com",
+      "password": "$2b$12$e6F8pe5AUrhnKjOS/ULT9uDyCWAyQvAwNsGCHFbJh3txuf.lPhVWa"
+    }
+  ],
+  "expenses": []
+}
