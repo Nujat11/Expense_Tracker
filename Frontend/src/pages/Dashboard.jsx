@@ -342,15 +342,30 @@ function Dashboard() {
                       <button type="button" className="btn-primary btn-small" style={{ padding: '6px 10px', fontSize: '0.8rem' }} onClick={() => navigate('/wallets')}>View All Wallets</button>
                     </div>
                     <div style={{ marginTop: 6 }}>
-                      {/* Wallet names hidden here by policy — use View All Wallets to manage or view other wallets. */}
-                      <button
-                        type="button"
-                        className={`wallet-tab active`}
-                        onClick={() => navigate('/wallet/Main%20Wallet')}
-                        style={{ cursor: 'pointer' }}
-                      >
-                        Main Wallet
-                      </button>
+                      <div className="wallet-tabs-row">
+                        <div className="wallet-tab-group wallet-tab-group-secondary">
+                          {wallets.map((w) => (
+                            <div className="wallet-chip" key={w.wallet}>
+                              <button
+                                type="button"
+                                className={`wallet-tab ${walletFilter === w.wallet ? 'active' : ''}`}
+                                onClick={() => navigate(`/wallet/${encodeURIComponent(w.wallet)}`)}
+                              >
+                                {w.wallet}
+                              </button>
+                              {w.wallet !== 'Main Wallet' && (
+                                <button
+                                  className="wallet-tab-delete"
+                                  onClick={(e) => { e.stopPropagation(); handleDeleteWallet(w.wallet); }}
+                                  title={`Delete ${w.wallet}`}
+                                >
+                                  ×
+                                </button>
+                              )}
+                            </div>
+                          ))}
+                        </div>
+                      </div>
                     </div>
                   </div>
 
