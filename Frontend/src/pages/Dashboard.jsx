@@ -342,48 +342,79 @@ function Dashboard() {
                 </select>
               </div>
 
-              <div style={{ gridColumn: '1 / -1' }}>
-                <label style={{ fontSize: '0.8rem', color: '#aaa', display: 'block', marginBottom: '8px' }}>Wallet View</label>
-                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
-                  {wallets.map((w) => {
-                    const walletName = w.wallet || w;
-                    const active = walletFilter === walletName;
-                    return (
-                      <div key={walletName} style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                        <button
-                          type="button"
-                          onClick={() => setWalletFilter(walletName)}
-                          style={{
-                            padding: '8px 14px',
-                            borderRadius: '999px',
-                            border: active ? '1px solid #00d4ff' : '1px solid rgba(255,255,255,0.15)',
-                            background: active ? 'rgba(0, 212, 255, 0.12)' : 'rgba(255,255,255,0.05)',
-                            color: active ? '#00d4ff' : '#ddd',
-                            cursor: 'pointer',
-                            fontSize: '0.85rem'
-                          }}
-                        >
-                          {walletName}
-                        </button>
-                        {walletName !== 'Main Wallet' && (
-                          <button
-                            type="button"
-                            onClick={() => handleDeleteWallet(walletName)}
-                            style={{
-                              border: 'none',
-                              background: 'transparent',
-                              color: '#ff7f7f',
-                              fontSize: '0.95rem',
-                              cursor: 'pointer',
-                              padding: '0'
-                            }}
-                          >
-                            ✕
-                          </button>
-                        )}
+              <div className="wallet-section" style={{ gridColumn: '1 / -1' }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '16px', flexWrap: 'wrap' }}>
+                  <div>
+                    <label style={{ fontSize: '0.8rem', color: '#aaa', display: 'block', marginBottom: '8px' }}>Wallet View</label>
+                    <div className="wallet-tabs-row">
+                      <div className="wallet-tab-group wallet-tab-group-primary">
+                        {wallets
+                          .filter((w) => (w.wallet || w) === 'Main Wallet')
+                          .map((w) => {
+                            const walletName = w.wallet || w;
+                            const active = walletFilter === walletName;
+                            return (
+                              <button
+                                key={walletName}
+                                type="button"
+                                className={`wallet-tab ${active ? 'active' : ''}`}
+                                onClick={() => setWalletFilter(walletName)}
+                              >
+                                {walletName}
+                              </button>
+                            );
+                          })}
                       </div>
-                    );
-                  })}
+                      <div className="wallet-tab-group wallet-tab-group-secondary">
+                        {wallets
+                          .filter((w) => (w.wallet || w) !== 'Main Wallet')
+                          .map((w) => {
+                            const walletName = w.wallet || w;
+                            const active = walletFilter === walletName;
+                            return (
+                              <div key={walletName} className="wallet-chip">
+                                <button
+                                  type="button"
+                                  className={`wallet-tab ${active ? 'active' : ''}`}
+                                  onClick={() => setWalletFilter(walletName)}
+                                >
+                                  {walletName}
+                                </button>
+                                <button
+                                  type="button"
+                                  className="wallet-tab-delete"
+                                  onClick={() => handleDeleteWallet(walletName)}
+                                >
+                                  ✕
+                                </button>
+                              </div>
+                            );
+                          })}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="wallet-add-row">
+                    <label style={{ fontSize: '0.8rem', color: '#aaa', display: 'block', marginBottom: '8px' }}>Add Wallet</label>
+                    <div style={{ display: 'flex', gap: '8px', width: '100%', maxWidth: '380px' }}>
+                      <input
+                        type="text"
+                        className="input-glass"
+                        style={{ padding: '8px 12px', fontSize: '0.85rem', flex: 1, marginBottom: 0 }}
+                        placeholder="New wallet name"
+                        value={newWalletName}
+                        onChange={(e) => setNewWalletName(e.target.value)}
+                      />
+                      <button
+                        type="button"
+                        className="btn-primary btn-small"
+                        style={{ whiteSpace: 'nowrap' }}
+                        onClick={handleCreateWallet}
+                      >
+                        Create
+                      </button>
+                    </div>
+                  </div>
                 </div>
               </div>
 

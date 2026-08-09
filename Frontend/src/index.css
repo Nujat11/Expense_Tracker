@@ -152,6 +152,86 @@ body::before {
 
 .btn-small { padding: 8px 16px; width: auto; font-size: 0.85rem; }
 
+.wallet-tabs-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+}
+
+.wallet-tab-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+}
+
+.wallet-tab-group-primary {
+  min-width: 160px;
+}
+
+.wallet-tab-group-secondary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: flex-end;
+  flex: 1;
+}
+
+.wallet-chip {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.wallet-tab {
+  padding: 8px 16px;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,0.15);
+  background: rgba(255,255,255,0.06);
+  color: #ddd;
+  cursor: pointer;
+  font-size: 0.85rem;
+  transition: var(--transition);
+}
+
+.wallet-tab:hover,
+.wallet-tab.active {
+  border-color: #00d4ff;
+  background: rgba(0, 212, 255, 0.12);
+  color: #00d4ff;
+}
+
+.wallet-tab-delete {
+  border: none;
+  background: rgba(255, 77, 109, 0.12);
+  color: #ff7f7f;
+  border-radius: 999px;
+  width: 28px;
+  height: 28px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 0.85rem;
+  transition: var(--transition);
+}
+
+.wallet-tab-delete:hover {
+  background: rgba(255, 77, 109, 0.22);
+}
+
+.wallet-add-row {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 260px;
+}
+
+.wallet-section {
+  width: 100%;
+}
+
 /* ====== NAVBAR ====== */
 .navbar {
   display: flex;
