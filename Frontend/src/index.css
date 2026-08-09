@@ -288,6 +288,36 @@ body::before {
   .wallet-add-row { min-width: 320px; }
 }
 
+/* ====== FILTER PANEL (form-like) ====== */
+.filter-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 20px;
+  background: rgba(0,0,0,0.2);
+  padding: 15px;
+  border-radius: 12px;
+  border: 1px solid rgba(255,255,255,0.03);
+}
+.filter-panel .filter-row {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.filter-panel label { font-size: 0.85rem; color: #aaa; }
+.filter-panel .input-glass { width: 100%; }
+.filter-panel .two-column {
+  display: flex;
+  gap: 12px;
+}
+.filter-panel .two-column > * { flex: 1; }
+
+@media (min-width: 900px) {
+  .filter-panel { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
+  .filter-panel .wallet-section { grid-column: 1 / -1; }
+  .filter-panel .two-column { display: flex; }
+}
+
 /* ====== NAVBAR ====== */
 .navbar {
   display: flex;

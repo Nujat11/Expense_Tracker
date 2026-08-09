@@ -307,16 +307,7 @@ function Dashboard() {
             </div>
 
             {/* Filter and Sorting Controls Pane */}
-            <div style={{ 
-              display: 'grid', 
-              gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', 
-              gap: '12px', 
-              marginBottom: '20px',
-              background: 'rgba(0,0,0,0.2)',
-              padding: '15px',
-              borderRadius: '12px',
-              border: '1px solid rgba(255,255,255,0.03)'
-            }}>
+            <div className="filter-panel">
               <div>
                 <label style={{ fontSize: '0.8rem', color: '#aaa', display: 'block', marginBottom: '6px' }}>Search Title</label>
                 <input 
