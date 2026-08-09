@@ -341,45 +341,16 @@ function Dashboard() {
                       <label style={{ fontSize: '0.8rem', color: '#aaa', display: 'block' }}>Wallet View</label>
                       <button type="button" className="btn-primary btn-small" style={{ padding: '6px 10px', fontSize: '0.8rem' }} onClick={() => navigate('/wallets')}>View All Wallets</button>
                     </div>
-                    <div className="wallet-tabs-row">
-                      <div className="wallet-tab-group wallet-tab-group-primary">
-                        {wallets
-                          .filter((w) => (w.wallet || w) === 'Main Wallet')
-                          .map((w) => {
-                            const walletName = w.wallet || w;
-                            const active = walletFilter === walletName;
-                            return (
-                              <button
-                                key={walletName}
-                                type="button"
-                                className={`wallet-tab ${active ? 'active' : ''}`}
-                                onClick={() => navigate(`/wallet/${encodeURIComponent(walletName)}`)}
-                              >
-                                {walletName}
-                              </button>
-                            );
-                          })}
-                      </div>
-                      <div className="wallet-tab-group wallet-tab-group-secondary">
-                        {wallets
-                          .filter((w) => (w.wallet || w) !== 'Main Wallet')
-                          .map((w) => {
-                            const walletName = w.wallet || w;
-                            const active = walletFilter === walletName;
-                            return (
-                              <div key={walletName} className="wallet-chip">
-                                <button
-                                  type="button"
-                                  className={`wallet-tab ${active ? 'active' : ''}`}
-                                  onClick={() => navigate(`/wallet/${encodeURIComponent(walletName)}`)}
-                                >
-                                  {walletName}
-                                </button>
-                                {/* deletion disabled: wallets cannot be deleted */}
-                              </div>
-                            );
-                          })}
-                      </div>
+                    <div style={{ marginTop: 6 }}>
+                      {/* Wallet names hidden here by policy — use View All Wallets to manage or view other wallets. */}
+                      <button
+                        type="button"
+                        className={`wallet-tab active`}
+                        onClick={() => navigate('/wallet/Main%20Wallet')}
+                        style={{ cursor: 'pointer' }}
+                      >
+                        Main Wallet
+                      </button>
                     </div>
                   </div>
 
