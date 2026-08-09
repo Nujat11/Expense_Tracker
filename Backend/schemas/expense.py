@@ -8,6 +8,7 @@ class ExpenseBase(BaseModel):
     category: str
     type: str
     date: date
+    wallet: str = 'Main Wallet'
 
 class ExpenseCreate(ExpenseBase):
     user_id: int
@@ -18,6 +19,7 @@ class ExpenseUpdate(BaseModel):
     category: Optional[str] = None
     type: Optional[str] = None
     date: Optional[date] = None
+    wallet: Optional[str] = None
 
 class ExpenseOut(ExpenseBase):
     id: int

@@ -13,6 +13,8 @@ const CATEGORY_ICONS = {
 function Dashboard() {
   const [user, setUser] = useState(null);
   const [transactions, setTransactions] = useState([]);
+  const [wallets, setWallets] = useState([{ wallet: 'Main Wallet' }]);
+  const [walletFilter, setWalletFilter] = useState('All Wallets');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [expenseToEdit, setExpenseToEdit] = useState(null);
   
@@ -38,6 +40,7 @@ function Dashboard() {
       const parsedUser = JSON.parse(storedUser);
       setUser(parsedUser);
       fetchTransactions(parsedUser.id);
+      fetchWallets(parsedUser.id);
 
       // Load budget limit
       const storedBudget = localStorage.getItem(`budget_limit_${parsedUser.id}`);
@@ -57,6 +60,16 @@ function Dashboard() {
     }
   };
 
+  const fetchWallets = async (userId) => {
+    try {
+      const data = await dataService.getWallets(userId);
+      setWallets(data.length > 0 ? data : [{ wallet: 'Main Wallet' }]);
+    } catch (err) {
+      console.error('Error fetching wallets', err);
+      setWallets([{ wallet: 'Main Wallet' }]);
+    }
+  };
+
   const handleSave = async (expenseData) => {
     try {
       if (expenseToEdit) {
@@ -67,6 +80,7 @@ function Dashboard() {
       setIsModalOpen(false);
       setExpenseToEdit(null);
       fetchTransactions(user.id);
+      fetchWallets(user.id);
     } catch (err) {
       console.error('Error saving expense', err);
     }
@@ -94,6 +108,7 @@ function Dashboard() {
     if (user) {
       dataService.seedMockData(user.id);
       fetchTransactions(user.id);
+      fetchWallets(user.id);
     }
   };
 
@@ -108,18 +123,13 @@ function Dashboard() {
   };
 
   // Calculations
-  const totalIncome = transactions.filter(t => t.type === 'Income').reduce((acc, curr) => acc + curr.amount, 0);
-  const totalExpense = transactions.filter(t => t.type === 'Expense').reduce((acc, curr) => acc + curr.amount, 0);
-  const balance = totalIncome - totalExpense;
-  const percentSpent = budgetLimit > 0 ? (totalExpense / budgetLimit) * 100 : 0;
-
-  // Filter & Sort implementation
   const filteredTransactions = transactions
     .filter(t => {
       const matchesSearch = t.title.toLowerCase().includes(searchQuery.toLowerCase());
       const matchesCategory = categoryFilter === 'All' || t.category === categoryFilter;
       const matchesType = typeFilter === 'All' || t.type === typeFilter;
-      return matchesSearch && matchesCategory && matchesType;
+      const matchesWallet = walletFilter === 'All Wallets' || t.wallet === walletFilter;
+      return matchesSearch && matchesCategory && matchesType && matchesWallet;
     })
     .sort((a, b) => {
       if (sortBy === 'date_desc') {
@@ -136,6 +146,11 @@ function Dashboard() {
       }
       return 0;
     });
+
+  const totalIncome = filteredTransactions.filter(t => t.type === 'Income').reduce((acc, curr) => acc + curr.amount, 0);
+  const totalExpense = filteredTransactions.filter(t => t.type === 'Expense').reduce((acc, curr) => acc + curr.amount, 0);
+  const balance = totalIncome - totalExpense;
+  const percentSpent = budgetLimit > 0 ? (totalExpense / budgetLimit) * 100 : 0;
 
   const fmt = (n) => `৳ ${n.toLocaleString('en-BD', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 
@@ -291,6 +306,21 @@ function Dashboard() {
               </div>
 
               <div>
+                <label style={{ fontSize: '0.8rem', color: '#aaa', display: 'block', marginBottom: '6px' }}>Wallet</label>
+                <select 
+                  className="input-glass" 
+                  style={{ marginBottom: 0, padding: '8px 12px', fontSize: '0.85rem' }}
+                  value={walletFilter}
+                  onChange={(e) => setWalletFilter(e.target.value)}
+                >
+                  <option value="All Wallets">All Wallets</option>
+                  {wallets.map((w) => (
+                    <option key={w.wallet || w} value={w.wallet || w}>{w.wallet || w}</option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
                 <label style={{ fontSize: '0.8rem', color: '#aaa', display: 'block', marginBottom: '6px' }}>Filter Category</label>
                 <select 
                   className="input-glass" 
@@ -338,7 +368,7 @@ function Dashboard() {
                     </div>
                     <div className="t-info">
                       <div className="t-title">{t.title}</div>
-                      <span className="t-cat">{t.category}</span>
+                      <span className="t-cat">{t.category} · {t.wallet || 'Main Wallet'}</span>
                     </div>
                     <div className="t-right" style={{ marginRight: '15px' }}>
                       <div className={`t-amt ${t.type === 'Income' ? 'income' : 'expense'}`}>
@@ -380,6 +410,7 @@ function Dashboard() {
         onClose={() => setIsModalOpen(false)}
         onSave={handleSave}
         expenseToEdit={expenseToEdit}
+        wallets={wallets}
       />
     </>
   );

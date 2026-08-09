@@ -34,6 +34,24 @@ const saveLocalUsers = (users) => localStorage.setItem('mock_users', JSON.string
 const getLocalExpenses = () => JSON.parse(localStorage.getItem('mock_expenses') || '[]');
 const saveLocalExpenses = (expenses) => localStorage.setItem('mock_expenses', JSON.stringify(expenses));
 
+const getLocalWallets = () => JSON.parse(localStorage.getItem('mock_wallets') || '[]');
+const saveLocalWallets = (wallets) => localStorage.setItem('mock_wallets', JSON.stringify(wallets));
+
+const ensureLocalWallets = (userId) => {
+  const wallets = getLocalWallets();
+  const owned = wallets.filter((w) => w.user_id === userId);
+  if (owned.length === 0) {
+    const nextId = wallets.length > 0 ? Math.max(...wallets.map((w) => w.id)) + 1 : 1;
+    const defaultWallets = [
+      { id: nextId, user_id: userId, wallet: 'Main Wallet' },
+      { id: nextId + 1, user_id: userId, wallet: 'Savings Wallet' }
+    ];
+    saveLocalWallets([...wallets, ...defaultWallets]);
+    return defaultWallets;
+  }
+  return owned;
+};
+
 export const dataService = {
   login: async (email, password) => {
     const mode = getStorageMode();
@@ -76,11 +94,23 @@ export const dataService = {
     const mode = getStorageMode();
     if (mode === 'local') {
       const expenses = getLocalExpenses();
-      return expenses.filter(e => e.user_id === userId);
+      return expenses
+        .filter((e) => e.user_id === userId)
+        .map((e) => ({ ...e, wallet: e.wallet || 'Main Wallet' }));
     } else {
       const res = await api.get(`/expenses/${userId}`);
-      return res.data;
+      return res.data.map((e) => ({ ...e, wallet: e.wallet || 'Main Wallet' }));
     }
+  },
+
+  getWallets: async (userId) => {
+    const mode = getStorageMode();
+    if (mode === 'local') {
+      return ensureLocalWallets(userId);
+    }
+    const res = await api.get(`/expenses/${userId}`);
+    const wallets = Array.from(new Set(res.data.map((expense) => expense.wallet || 'Main Wallet')));
+    return wallets.map((walletName) => ({ wallet: walletName }));
   },
 
   createExpense: async (expenseData, userId) => {
@@ -95,7 +125,8 @@ export const dataService = {
         amount: parseFloat(expenseData.amount),
         category: expenseData.category,
         type: expenseData.type,
-        date: expenseData.date
+        date: expenseData.date,
+        wallet: expenseData.wallet || 'Main Wallet'
       };
       expenses.push(newExpense);
       saveLocalExpenses(expenses);
@@ -119,7 +150,8 @@ export const dataService = {
         amount: parseFloat(expenseData.amount),
         category: expenseData.category,
         type: expenseData.type,
-        date: expenseData.date
+        date: expenseData.date,
+        wallet: expenseData.wallet || expenses[index].wallet || 'Main Wallet'
       };
       saveLocalExpenses(expenses);
       return expenses[index];
@@ -156,13 +188,13 @@ export const dataService = {
     };
 
     const mockItems = [
-      { id: 1001, user_id: userId, title: 'Monthly Salary', amount: 5000, category: 'Salary', type: 'Income', date: formatDate(10) },
-      { id: 1002, user_id: userId, title: 'Supermarket Groceries', amount: 154.20, category: 'Food', type: 'Expense', date: formatDate(8) },
-      { id: 1003, user_id: userId, title: 'Apartment Rent', amount: 1200, category: 'Rent', type: 'Expense', date: formatDate(5) },
-      { id: 1004, user_id: userId, title: 'Netflix & Spotify Subs', amount: 24.99, category: 'Entertainment', type: 'Expense', date: formatDate(4) },
-      { id: 1005, user_id: userId, title: 'Freelance Design Project', amount: 850, category: 'Salary', type: 'Income', date: formatDate(2) },
-      { id: 1006, user_id: userId, title: 'Uber Taxi Rides', amount: 45.50, category: 'Transport', type: 'Expense', date: formatDate(1) },
-      { id: 1007, user_id: userId, title: 'Starbucks Coffee', amount: 12.80, category: 'Food', type: 'Expense', date: formatDate(0) },
+      { id: 1001, user_id: userId, title: 'Monthly Salary', amount: 5000, category: 'Salary', type: 'Income', date: formatDate(10), wallet: 'Main Wallet' },
+      { id: 1002, user_id: userId, title: 'Supermarket Groceries', amount: 154.20, category: 'Food', type: 'Expense', date: formatDate(8), wallet: 'Main Wallet' },
+      { id: 1003, user_id: userId, title: 'Apartment Rent', amount: 1200, category: 'Rent', type: 'Expense', date: formatDate(5), wallet: 'Main Wallet' },
+      { id: 1004, user_id: userId, title: 'Netflix & Spotify Subs', amount: 24.99, category: 'Entertainment', type: 'Expense', date: formatDate(4), wallet: 'Savings Wallet' },
+      { id: 1005, user_id: userId, title: 'Freelance Design Project', amount: 850, category: 'Salary', type: 'Income', date: formatDate(2), wallet: 'Savings Wallet' },
+      { id: 1006, user_id: userId, title: 'Uber Taxi Rides', amount: 45.50, category: 'Transport', type: 'Expense', date: formatDate(1), wallet: 'Main Wallet' },
+      { id: 1007, user_id: userId, title: 'Starbucks Coffee', amount: 12.80, category: 'Food', type: 'Expense', date: formatDate(0), wallet: 'Main Wallet' },
     ];
 
     const finalExpenses = [...cleanExpenses, ...mockItems];
