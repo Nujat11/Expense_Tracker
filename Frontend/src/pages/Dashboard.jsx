@@ -337,7 +337,10 @@ function Dashboard() {
               <div className="wallet-section" style={{ gridColumn: '1 / -1' }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '16px', flexWrap: 'wrap' }}>
                   <div>
-                    <label style={{ fontSize: '0.8rem', color: '#aaa', display: 'block', marginBottom: '8px' }}>Wallet View</label>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 8 }}>
+                      <label style={{ fontSize: '0.8rem', color: '#aaa', display: 'block' }}>Wallet View</label>
+                      <button type="button" className="btn-primary btn-small" style={{ padding: '6px 10px', fontSize: '0.8rem' }} onClick={() => navigate('/wallets')}>View All Wallets</button>
+                    </div>
                     <div className="wallet-tabs-row">
                       <div className="wallet-tab-group wallet-tab-group-primary">
                         {wallets
