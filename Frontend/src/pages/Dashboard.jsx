@@ -13,8 +13,9 @@ const CATEGORY_ICONS = {
 function Dashboard() {
   const [user, setUser] = useState(null);
   const [transactions, setTransactions] = useState([]);
-  const [wallets, setWallets] = useState([{ wallet: 'Main Wallet' }]);
-  const [walletFilter, setWalletFilter] = useState('All Wallets');
+  const [wallets, setWallets] = useState([{ wallet: 'Main Wallet' }, { wallet: 'Savings Wallet' }]);
+  const [walletFilter, setWalletFilter] = useState('Main Wallet');
+  const [newWalletName, setNewWalletName] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [expenseToEdit, setExpenseToEdit] = useState(null);
   
@@ -63,10 +64,28 @@ function Dashboard() {
   const fetchWallets = async (userId) => {
     try {
       const data = await dataService.getWallets(userId);
-      setWallets(data.length > 0 ? data : [{ wallet: 'Main Wallet' }]);
+      const walletNames = new Set(data.map((w) => w.wallet || 'Main Wallet'));
+      walletNames.add('Main Wallet');
+      walletNames.add('Savings Wallet');
+      setWallets(Array.from(walletNames).map((walletName) => ({ wallet: walletName })));
     } catch (err) {
       console.error('Error fetching wallets', err);
-      setWallets([{ wallet: 'Main Wallet' }]);
+      setWallets([{ wallet: 'Main Wallet' }, { wallet: 'Savings Wallet' }]);
+    }
+  };
+
+  const handleCreateWallet = async () => {
+    if (!newWalletName.trim()) {
+      return;
+    }
+    try {
+      await dataService.createWallet(user.id, newWalletName);
+      setNewWalletName('');
+      fetchWallets(user.id);
+      setWalletFilter(newWalletName.trim());
+    } catch (err) {
+      console.error('Error creating wallet', err);
+      alert(err.message || 'Unable to create wallet');
     }
   };
 
@@ -128,7 +147,7 @@ function Dashboard() {
       const matchesSearch = t.title.toLowerCase().includes(searchQuery.toLowerCase());
       const matchesCategory = categoryFilter === 'All' || t.category === categoryFilter;
       const matchesType = typeFilter === 'All' || t.type === typeFilter;
-      const matchesWallet = walletFilter === 'All Wallets' || t.wallet === walletFilter;
+      const matchesWallet = walletFilter === 'Main Wallet' || t.wallet === walletFilter;
       return matchesSearch && matchesCategory && matchesType && matchesWallet;
     })
     .sort((a, b) => {
@@ -313,11 +332,32 @@ function Dashboard() {
                   value={walletFilter}
                   onChange={(e) => setWalletFilter(e.target.value)}
                 >
-                  <option value="All Wallets">All Wallets</option>
                   {wallets.map((w) => (
                     <option key={w.wallet || w} value={w.wallet || w}>{w.wallet || w}</option>
                   ))}
                 </select>
+              </div>
+
+              <div>
+                <label style={{ fontSize: '0.8rem', color: '#aaa', display: 'block', marginBottom: '6px' }}>Add Wallet</label>
+                <div style={{ display: 'flex', gap: '8px' }}>
+                  <input
+                    type="text"
+                    className="input-glass"
+                    style={{ padding: '8px 12px', fontSize: '0.85rem', flex: 1 }}
+                    placeholder="New wallet name"
+                    value={newWalletName}
+                    onChange={(e) => setNewWalletName(e.target.value)}
+                  />
+                  <button
+                    type="button"
+                    className="btn-primary btn-small"
+                    style={{ whiteSpace: 'nowrap' }}
+                    onClick={handleCreateWallet}
+                  >
+                    Create
+                  </button>
+                </div>
               </div>
 
               <div>

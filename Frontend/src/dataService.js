@@ -40,15 +40,21 @@ const saveLocalWallets = (wallets) => localStorage.setItem('mock_wallets', JSON.
 const ensureLocalWallets = (userId) => {
   const wallets = getLocalWallets();
   const owned = wallets.filter((w) => w.user_id === userId);
-  if (owned.length === 0) {
+  const defaultNames = ['Main Wallet', 'Savings Wallet'];
+  const ownedNames = new Set(owned.map((w) => w.wallet));
+  const missingDefaults = defaultNames.filter((name) => !ownedNames.has(name));
+
+  if (owned.length === 0 || missingDefaults.length > 0) {
     const nextId = wallets.length > 0 ? Math.max(...wallets.map((w) => w.id)) + 1 : 1;
-    const defaultWallets = [
-      { id: nextId, user_id: userId, wallet: 'Main Wallet' },
-      { id: nextId + 1, user_id: userId, wallet: 'Savings Wallet' }
-    ];
-    saveLocalWallets([...wallets, ...defaultWallets]);
-    return defaultWallets;
+    const newWallets = missingDefaults.map((name, index) => ({
+      id: nextId + index,
+      user_id: userId,
+      wallet: name
+    }));
+    saveLocalWallets([...wallets, ...newWallets]);
+    return [...owned, ...newWallets];
   }
+
   return owned;
 };
 
@@ -106,11 +112,37 @@ export const dataService = {
   getWallets: async (userId) => {
     const mode = getStorageMode();
     if (mode === 'local') {
-      return ensureLocalWallets(userId);
+      const storedWallets = ensureLocalWallets(userId);
+      const expenses = getLocalExpenses().filter((e) => e.user_id === userId);
+      const walletNames = new Set(storedWallets.map((w) => w.wallet));
+      expenses.forEach((expense) => walletNames.add(expense.wallet || 'Main Wallet'));
+      walletNames.add('Main Wallet');
+      walletNames.add('Savings Wallet');
+      return Array.from(walletNames).map((walletName) => ({ wallet: walletName }));
     }
     const res = await api.get(`/expenses/${userId}`);
     const wallets = Array.from(new Set(res.data.map((expense) => expense.wallet || 'Main Wallet')));
     return wallets.map((walletName) => ({ wallet: walletName }));
+  },
+
+  createWallet: async (userId, walletName) => {
+    const mode = getStorageMode();
+    const normalized = walletName?.trim();
+    if (!normalized) {
+      throw new Error('Wallet name is required');
+    }
+    if (mode === 'local') {
+      const wallets = getLocalWallets();
+      const owned = wallets.filter((w) => w.user_id === userId);
+      if (owned.some((w) => w.wallet.toLowerCase() === normalized.toLowerCase())) {
+        throw new Error('Wallet already exists');
+      }
+      const newId = wallets.length > 0 ? Math.max(...wallets.map((w) => w.id)) + 1 : 1;
+      const newWallet = { id: newId, user_id: userId, wallet: normalized };
+      saveLocalWallets([...wallets, newWallet]);
+      return newWallet;
+    }
+    throw new Error('Create wallet is only available in local mode');
   },
 
   createExpense: async (expenseData, userId) => {

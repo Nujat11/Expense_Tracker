@@ -24,9 +24,9 @@ function ExpenseModal({ isOpen, onClose, onSave, expenseToEdit, wallets }) {
       setCategory('Food');
       setType('Expense');
       setDate(new Date().toISOString().split('T')[0]);
-      setWallet('Main Wallet');
+      setWallet(wallets?.[0]?.wallet || 'Main Wallet');
     }
-  }, [expenseToEdit, isOpen]);
+  }, [expenseToEdit, isOpen, wallets]);
 
   if (!isOpen) return null;
 
