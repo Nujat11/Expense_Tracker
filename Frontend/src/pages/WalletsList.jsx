@@ -21,7 +21,8 @@ function WalletsList() {
   const fetchAll = async (userId) => {
     try {
       const [w, t] = await Promise.all([dataService.getWallets(userId), dataService.getExpenses(userId)]);
-      setWallets(w.map(x => x.wallet || x));
+      const names = w.map(x => x.wallet || x).filter((name) => name !== 'Main Wallet' && name !== 'Savings Wallet');
+      setWallets(names);
       setTransactions(t);
     } catch (err) {
       console.error('Error loading wallets list', err);
@@ -46,16 +47,14 @@ function WalletsList() {
           </div>
         </div>
 
-        <div className="cards-container" style={{ gap: 16 }}>
+        <div className="wallets-list-container">
           {wallets.map((name) => (
-            <div key={name} className="glass-panel" style={{ padding: 16, minWidth: 180, cursor: 'pointer' }} onClick={() => navigate(`/wallet/${encodeURIComponent(name)}`)}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                <div style={{ width: 48, height: 48, borderRadius: 10, background: 'rgba(255,255,255,0.04)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>💳</div>
-                <div>
-                  <div style={{ fontWeight: 700 }}>{name}</div>
-                  <div style={{ color: 'var(--text-secondary)', marginTop: 6 }}>{balanceFor(name).toLocaleString('en-BD', { style: 'currency', currency: 'BDT' })}</div>
-                </div>
+            <div key={name} className="wallet-list-row" onClick={() => navigate(`/wallet/${encodeURIComponent(name)}`)}>
+              <div>
+                <div className="wallet-list-name">{name}</div>
+                <div className="wallet-list-balance">{balanceFor(name).toLocaleString('en-BD', { style: 'currency', currency: 'BDT' })}</div>
               </div>
+              <div className="wallet-list-arrow">›</div>
             </div>
           ))}
         </div>

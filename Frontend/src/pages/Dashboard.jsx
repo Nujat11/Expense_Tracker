@@ -161,6 +161,8 @@ function Dashboard() {
   };
 
   // Calculations
+  const visibleWallets = wallets.filter(w => w.wallet !== 'Main Wallet' && w.wallet !== 'Savings Wallet');
+
   const filteredTransactions = transactions
     .filter(t => {
       const matchesSearch = t.title.toLowerCase().includes(searchQuery.toLowerCase());
@@ -335,38 +337,35 @@ function Dashboard() {
               </div>
 
               <div className="wallet-section" style={{ gridColumn: '1 / -1' }}>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '16px', flexWrap: 'wrap' }}>
-                  <div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 8 }}>
-                      <label style={{ fontSize: '0.8rem', color: '#aaa', display: 'block' }}>Wallet View</label>
+                <div style={{ display: 'grid', gap: '18px', gridTemplateColumns: '1.35fr 1fr' }}>
+                  <div className="wallet-list-panel">
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', gap: '12px', marginBottom: '12px' }}>
+                      <div>
+                        <label style={{ fontSize: '0.8rem', color: '#aaa', display: 'block' }}>Wallet View</label>
+                        <div style={{ color: '#fff', fontWeight: 700, marginTop: 4 }}>Choose a wallet</div>
+                      </div>
                       <button type="button" className="btn-primary btn-small" style={{ padding: '6px 10px', fontSize: '0.8rem' }} onClick={() => navigate('/wallets')}>View All Wallets</button>
                     </div>
-                    <div style={{ marginTop: 6 }}>
-                      <div className="wallet-tabs-row">
-                        <div className="wallet-tab-group wallet-tab-group-secondary">
-                          {wallets.map((w) => (
-                            <div className="wallet-chip" key={w.wallet}>
-                              <button
-                                type="button"
-                                className={`wallet-tab ${walletFilter === w.wallet ? 'active' : ''}`}
-                                onClick={() => navigate(`/wallet/${encodeURIComponent(w.wallet)}`)}
-                              >
-                                {w.wallet}
-                              </button>
-                              {w.wallet !== 'Main Wallet' && (
-                                <button
-                                  className="wallet-tab-delete"
-                                  onClick={(e) => { e.stopPropagation(); handleDeleteWallet(w.wallet); }}
-                                  title={`Delete ${w.wallet}`}
-                                >
-                                  ×
-                                </button>
-                              )}
-                            </div>
-                          ))}
-                        </div>
+
+                    {visibleWallets.length === 0 ? (
+                      <div className="empty-state" style={{ padding: '18px 14px', textAlign: 'center' }}>
+                        No individual wallets available yet.
                       </div>
-                    </div>
+                    ) : (
+                      <div style={{ display: 'grid', gap: '10px' }}>
+                        {visibleWallets.map((w) => (
+                          <button
+                            key={w.wallet}
+                            type="button"
+                            className="wallet-list-item"
+                            onClick={() => navigate(`/wallet/${encodeURIComponent(w.wallet)}`)}
+                          >
+                            <span>{w.wallet}</span>
+                            <span>›</span>
+                          </button>
+                        ))}
+                      </div>
+                    )}
                   </div>
 
                   <div className="wallet-add-row">
