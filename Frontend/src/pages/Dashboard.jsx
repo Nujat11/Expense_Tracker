@@ -20,6 +20,7 @@ function Dashboard() {
   const [expenseToEdit, setExpenseToEdit] = useState(null);
   const [draggedWallet, setDraggedWallet] = useState(null);
   const [deleteHovering, setDeleteHovering] = useState(false);
+  const [contextMenu, setContextMenu] = useState({ wallet: null, x: 0, y: 0, open: false });
   
   // Budget values
   const [budgetLimit, setBudgetLimit] = useState(2000);
@@ -109,6 +110,28 @@ function Dashboard() {
       alert(err.message || 'Unable to delete wallet');
     }
   };
+
+  const closeContextMenu = () => setContextMenu((prev) => ({ ...prev, open: false }));
+
+  const handleWalletContextMenu = (e, walletName) => {
+    e.preventDefault();
+    if (walletName === 'Main Wallet') return;
+    setContextMenu({ wallet: walletName, x: e.pageX, y: e.pageY, open: true });
+  };
+
+  useEffect(() => {
+    const closeOnOutside = () => {
+      if (contextMenu.open) closeContextMenu();
+    };
+
+    window.addEventListener('mousedown', closeOnOutside);
+    window.addEventListener('scroll', closeOnOutside);
+
+    return () => {
+      window.removeEventListener('mousedown', closeOnOutside);
+      window.removeEventListener('scroll', closeOnOutside);
+    };
+  }, [contextMenu.open]);
 
   const handleSave = async (expenseData) => {
     try {
@@ -363,6 +386,7 @@ function Dashboard() {
                             draggable
                             onDragStart={() => { setDraggedWallet(w.wallet); setDeleteHovering(false); }}
                             onDragEnd={() => { setDraggedWallet(null); setDeleteHovering(false); }}
+                            onContextMenu={(e) => handleWalletContextMenu(e, w.wallet)}
                             onClick={() => navigate(`/wallet/${encodeURIComponent(w.wallet)}`)}
                           >
                             <span>{w.wallet}</span>
@@ -390,6 +414,25 @@ function Dashboard() {
                     >
                       {draggedWallet ? `Drop "${draggedWallet}" here to delete` : 'Drag a wallet here to delete'}
                     </div>
+
+                    {contextMenu.open && (
+                      <div
+                        className="wallet-context-menu"
+                        style={{ left: contextMenu.x, top: contextMenu.y }}
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        <button
+                          type="button"
+                          className="wallet-context-menu-item"
+                          onClick={() => {
+                            handleDeleteWallet(contextMenu.wallet);
+                            closeContextMenu();
+                          }}
+                        >
+                          Delete "{contextMenu.wallet}"
+                        </button>
+                      </div>
+                    )}
                   </div>
 
                   <div className="wallet-add-row" style={{ maxWidth: '100%' }}>
