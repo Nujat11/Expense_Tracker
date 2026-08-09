@@ -418,29 +418,6 @@ function Dashboard() {
                 </div>
               </div>
 
-              <div>
-                <label style={{ fontSize: '0.8rem', color: '#aaa', display: 'block', marginBottom: '6px' }}>Add Wallet</label>
-                <div style={{ display: 'flex', gap: '8px' }}>
-                  <input
-                    type="text"
-                    className="input-glass"
-                    style={{ padding: '8px 12px', fontSize: '0.85rem', flex: 1 }}
-                    placeholder="New wallet name"
-                    value={newWalletName}
-                    onChange={(e) => setNewWalletName(e.target.value)}
-                  />
-                  <button
-                    type="button"
-                    className="btn-primary btn-small"
-                    style={{ whiteSpace: 'nowrap' }}
-                    onClick={handleCreateWallet}
-                  >
-                    Create
-                  </button>
-                </div>
-              </div>
-
-              <div>
                 <label style={{ fontSize: '0.8rem', color: '#aaa', display: 'block', marginBottom: '6px' }}>Filter Category</label>
                 <select 
                   className="input-glass" 
