@@ -64,10 +64,11 @@ function Dashboard() {
   const fetchWallets = async (userId) => {
     try {
       const data = await dataService.getWallets(userId);
-      const walletNames = new Set(data.map((w) => w.wallet || 'Main Wallet'));
-      walletNames.add('Main Wallet');
-      walletNames.add('Savings Wallet');
-      setWallets(Array.from(walletNames).map((walletName) => ({ wallet: walletName })));
+      // Ensure canonical order: Main, Savings, then others
+      const names = data.map((w) => w.wallet || 'Main Wallet');
+      const others = Array.from(new Set(names.filter(n => n !== 'Main Wallet' && n !== 'Savings Wallet'))).sort((a,b)=>a.localeCompare(b));
+      const ordered = ['Main Wallet', 'Savings Wallet', ...others];
+      setWallets(ordered.map((walletName) => ({ wallet: walletName })));
     } catch (err) {
       console.error('Error fetching wallets', err);
       setWallets([{ wallet: 'Main Wallet' }, { wallet: 'Savings Wallet' }]);
@@ -358,7 +359,7 @@ function Dashboard() {
                                 key={walletName}
                                 type="button"
                                 className={`wallet-tab ${active ? 'active' : ''}`}
-                                onClick={() => setWalletFilter(walletName)}
+                                onClick={() => navigate(`/wallet/${encodeURIComponent(walletName)}`)}
                               >
                                 {walletName}
                               </button>
@@ -376,7 +377,7 @@ function Dashboard() {
                                 <button
                                   type="button"
                                   className={`wallet-tab ${active ? 'active' : ''}`}
-                                  onClick={() => setWalletFilter(walletName)}
+                                  onClick={() => navigate(`/wallet/${encodeURIComponent(walletName)}`)}
                                 >
                                   {walletName}
                                 </button>
