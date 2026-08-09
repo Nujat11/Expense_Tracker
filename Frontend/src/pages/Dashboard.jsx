@@ -437,11 +437,11 @@ function Dashboard() {
 
                   <div className="wallet-add-row" style={{ maxWidth: '100%' }}>
                     <label style={{ fontSize: '0.8rem', color: '#aaa', display: 'block', marginBottom: '8px' }}>Add Wallet</label>
-                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '12px', width: '100%', maxWidth: '640px', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <div style={{ display: 'flex', gap: '12px', width: '100%', maxWidth: '760px', alignItems: 'center' }}>
                       <input
                         type="text"
                         className="input-glass"
-                        style={{ padding: '12px 16px', fontSize: '0.95rem', flex: 1, minWidth: '220px', marginBottom: 0 }}
+                        style={{ padding: '10px 14px', fontSize: '0.95rem', flex: 1, minWidth: 0, marginBottom: 0 }}
                         placeholder="New wallet name"
                         value={newWalletName}
                         onChange={(e) => setNewWalletName(e.target.value)}
@@ -449,7 +449,7 @@ function Dashboard() {
                       <button
                         type="button"
                         className="btn-primary btn-small"
-                        style={{ whiteSpace: 'nowrap', minWidth: '120px' }}
+                        style={{ whiteSpace: 'nowrap', padding: '10px 22px', marginLeft: 'auto' }}
                         onClick={handleCreateWallet}
                       >
                         Create
