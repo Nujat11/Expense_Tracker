@@ -42,6 +42,47 @@ A modern, full-stack web application to help individuals track daily income and 
 
 ---
 
+## 📝 Recent Project Updates
+
+- Wallet list UI: removed `Main Wallet` and `Savings Wallet` from the compact wallet board so individual wallets show in the list view.
+- Wallets list page: converted to a clickable list-style view that navigates to `/wallet/:walletName` on click.
+- Wallet navigation: clicking a wallet opens a per-wallet detail page with transactions and charts.
+- Add Wallet form: widened desktop input and pinned the `Create` button to the right edge for clearer alignment.
+- Drag-to-delete: desktop drag-and-drop target added — drag a wallet onto the delete area to remove it.
+- Right-click menu: desktop context menu on wallet list items to quickly delete a wallet.
+- Mobile UI fixes: prevented input zoom on mobile and improved navbar wrapping; stat cards use horizontal scroll on small screens for better layout.
+- Wallet create alignment and spacing: adjusted padding and responsive behavior so the form looks balanced across viewports.
+
+Refer to [CHANGELOG.md](CHANGELOG.md) for a commit-by-commit summary of recent changes.
+
+---
+
+## 📌 How to test these UI changes locally
+
+Frontend (Vite):
+```bash
+cd Frontend
+npm install
+npm run dev
+```
+
+Backend (FastAPI):
+```bash
+cd Backend
+pip install -r requirements.txt
+uvicorn main:app --reload --port 8000
+```
+
+Open the app at the address printed by Vite (typically `http://localhost:5173`) and verify:
+- Dashboard → Wallet View: visible wallet list and `Create` alignment
+- Wallets list page: items navigable to `/wallet/:walletName`
+- Desktop: try dragging a wallet onto the delete target and right-clicking a wallet to delete
+- Mobile (emulation): verify navbar wrapping and horizontal stat card scrolling
+
+If you'd like, I can also add screenshots and short GIFs to the `Documentation/` folder illustrating the new wallet interactions.
+
+---
+
 ## 🚀 Getting Started (Local Development)
 
 ### Prerequisites
