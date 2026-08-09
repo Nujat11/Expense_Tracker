@@ -120,9 +120,8 @@ export const dataService = {
       walletNames.add('Savings Wallet');
       return Array.from(walletNames).map((walletName) => ({ wallet: walletName }));
     }
-    const res = await api.get(`/expenses/${userId}`);
-    const wallets = Array.from(new Set(res.data.map((expense) => expense.wallet || 'Main Wallet')));
-    return wallets.map((walletName) => ({ wallet: walletName }));
+    const res = await api.get(`/wallets/${userId}`);
+    return res.data.map((wallet) => ({ wallet: wallet.wallet }));
   },
 
   createWallet: async (userId, walletName) => {
@@ -142,7 +141,8 @@ export const dataService = {
       saveLocalWallets([...wallets, newWallet]);
       return newWallet;
     }
-    throw new Error('Create wallet is only available in local mode');
+    const res = await api.post('/wallets', { user_id: userId, wallet: normalized });
+    return res.data;
   },
 
   createExpense: async (expenseData, userId) => {
