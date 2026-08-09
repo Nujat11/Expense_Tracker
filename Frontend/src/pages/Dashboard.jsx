@@ -147,7 +147,7 @@ function Dashboard() {
       const matchesSearch = t.title.toLowerCase().includes(searchQuery.toLowerCase());
       const matchesCategory = categoryFilter === 'All' || t.category === categoryFilter;
       const matchesType = typeFilter === 'All' || t.type === typeFilter;
-      const matchesWallet = walletFilter === 'Main Wallet' || t.wallet === walletFilter;
+      const matchesWallet = walletFilter === 'Main Wallet' ? true : t.wallet === walletFilter;
       return matchesSearch && matchesCategory && matchesType && matchesWallet;
     })
     .sort((a, b) => {
@@ -324,18 +324,32 @@ function Dashboard() {
                 </select>
               </div>
 
-              <div>
-                <label style={{ fontSize: '0.8rem', color: '#aaa', display: 'block', marginBottom: '6px' }}>Wallet</label>
-                <select 
-                  className="input-glass" 
-                  style={{ marginBottom: 0, padding: '8px 12px', fontSize: '0.85rem' }}
-                  value={walletFilter}
-                  onChange={(e) => setWalletFilter(e.target.value)}
-                >
-                  {wallets.map((w) => (
-                    <option key={w.wallet || w} value={w.wallet || w}>{w.wallet || w}</option>
-                  ))}
-                </select>
+              <div style={{ gridColumn: '1 / -1' }}>
+                <label style={{ fontSize: '0.8rem', color: '#aaa', display: 'block', marginBottom: '8px' }}>Wallet View</label>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
+                  {wallets.map((w) => {
+                    const walletName = w.wallet || w;
+                    const active = walletFilter === walletName;
+                    return (
+                      <button
+                        key={walletName}
+                        type="button"
+                        onClick={() => setWalletFilter(walletName)}
+                        style={{
+                          padding: '8px 14px',
+                          borderRadius: '999px',
+                          border: active ? '1px solid #00d4ff' : '1px solid rgba(255,255,255,0.15)',
+                          background: active ? 'rgba(0, 212, 255, 0.12)' : 'rgba(255,255,255,0.05)',
+                          color: active ? '#00d4ff' : '#ddd',
+                          cursor: 'pointer',
+                          fontSize: '0.85rem'
+                        }}
+                      >
+                        {walletName}
+                      </button>
+                    );
+                  })}
+                </div>
               </div>
 
               <div>
