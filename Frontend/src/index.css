@@ -351,6 +351,24 @@ body::before {
   border: 1px solid var(--glass-border);
 }
 
+@media (max-width: 640px) {
+  .navbar {
+    padding: 12px 12px;
+  }
+  .navbar-brand { font-size: 1.05rem; }
+  .navbar-right {
+    gap: 8px;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    align-items: center;
+  }
+  .navbar-right > * { flex: none; }
+  .navbar-right button, .navbar-right .navbar-user {
+    padding: 6px 10px;
+    font-size: 0.85rem;
+  }
+}
+
 /* ====== AUTH PAGES ====== */
 .auth-page-wrapper {
   display: flex;
