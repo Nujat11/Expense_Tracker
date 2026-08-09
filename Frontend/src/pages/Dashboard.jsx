@@ -375,13 +375,7 @@ function Dashboard() {
                                 >
                                   {walletName}
                                 </button>
-                                <button
-                                  type="button"
-                                  className="wallet-tab-delete"
-                                  onClick={() => handleDeleteWallet(walletName)}
-                                >
-                                  ✕
-                                </button>
+                                {/* deletion disabled: wallets cannot be deleted */}
                               </div>
                             );
                           })}

@@ -18,9 +18,5 @@ def get_wallets(user_id: int):
 
 @router.delete("/wallets/{user_id}/{wallet_name}", summary="Delete a wallet and its transactions")
 def delete_wallet(user_id: int, wallet_name: str):
-    if wallet_name == 'Main Wallet':
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Main Wallet cannot be deleted")
-    deleted = wallet_controller.delete_wallet(user_id=user_id, wallet_name=wallet_name)
-    if not deleted:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Wallet not found or cannot be deleted")
-    return {"detail": "Wallet deleted successfully"}
+    # Wallet deletion disabled by policy: prevent accidental or manual deletion.
+    raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Wallet deletion is disabled")
