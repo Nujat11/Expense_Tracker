@@ -145,6 +145,25 @@ export const dataService = {
     return res.data;
   },
 
+  deleteWallet: async (userId, walletName) => {
+    const mode = getStorageMode();
+    if (walletName === 'Main Wallet') {
+      throw new Error('Main Wallet cannot be deleted');
+    }
+    if (mode === 'local') {
+      const wallets = getLocalWallets();
+      const filtered = wallets.filter((w) => !(w.user_id === userId && w.wallet === walletName));
+      saveLocalWallets(filtered);
+      const expenses = getLocalExpenses();
+      const remaining = expenses.filter((e) => !(e.user_id === userId && e.wallet === walletName));
+      saveLocalExpenses(remaining);
+      return { detail: 'Wallet deleted locally' };
+    }
+    const encodedName = encodeURIComponent(walletName);
+    const res = await api.delete(`/wallets/${userId}/${encodedName}`);
+    return res.data;
+  },
+
   createExpense: async (expenseData, userId) => {
     const mode = getStorageMode();
     if (mode === 'local') {

@@ -89,6 +89,24 @@ function Dashboard() {
     }
   };
 
+  const handleDeleteWallet = async (walletName) => {
+    if (!walletName || walletName === 'Main Wallet') return;
+    if (!window.confirm(`Delete wallet "${walletName}" and all its transactions?`)) {
+      return;
+    }
+    try {
+      await dataService.deleteWallet(user.id, walletName);
+      if (walletFilter === walletName) {
+        setWalletFilter('Main Wallet');
+      }
+      fetchTransactions(user.id);
+      fetchWallets(user.id);
+    } catch (err) {
+      console.error('Error deleting wallet', err);
+      alert(err.message || 'Unable to delete wallet');
+    }
+  };
+
   const handleSave = async (expenseData) => {
     try {
       if (expenseToEdit) {
@@ -331,22 +349,39 @@ function Dashboard() {
                     const walletName = w.wallet || w;
                     const active = walletFilter === walletName;
                     return (
-                      <button
-                        key={walletName}
-                        type="button"
-                        onClick={() => setWalletFilter(walletName)}
-                        style={{
-                          padding: '8px 14px',
-                          borderRadius: '999px',
-                          border: active ? '1px solid #00d4ff' : '1px solid rgba(255,255,255,0.15)',
-                          background: active ? 'rgba(0, 212, 255, 0.12)' : 'rgba(255,255,255,0.05)',
-                          color: active ? '#00d4ff' : '#ddd',
-                          cursor: 'pointer',
-                          fontSize: '0.85rem'
-                        }}
-                      >
-                        {walletName}
-                      </button>
+                      <div key={walletName} style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                        <button
+                          type="button"
+                          onClick={() => setWalletFilter(walletName)}
+                          style={{
+                            padding: '8px 14px',
+                            borderRadius: '999px',
+                            border: active ? '1px solid #00d4ff' : '1px solid rgba(255,255,255,0.15)',
+                            background: active ? 'rgba(0, 212, 255, 0.12)' : 'rgba(255,255,255,0.05)',
+                            color: active ? '#00d4ff' : '#ddd',
+                            cursor: 'pointer',
+                            fontSize: '0.85rem'
+                          }}
+                        >
+                          {walletName}
+                        </button>
+                        {walletName !== 'Main Wallet' && (
+                          <button
+                            type="button"
+                            onClick={() => handleDeleteWallet(walletName)}
+                            style={{
+                              border: 'none',
+                              background: 'transparent',
+                              color: '#ff7f7f',
+                              fontSize: '0.95rem',
+                              cursor: 'pointer',
+                              padding: '0'
+                            }}
+                          >
+                            ✕
+                          </button>
+                        )}
+                      </div>
                     );
                   })}
                 </div>

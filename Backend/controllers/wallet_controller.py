@@ -17,3 +17,12 @@ def create_wallet(wallet: WalletCreate):
 
 def get_wallet_by_name(user_id: int, wallet_name: str):
     return db["wallets"].find_one({"user_id": user_id, "wallet": wallet_name}, {"_id": 0})
+
+def delete_wallet(user_id: int, wallet_name: str):
+    if wallet_name == 'Main Wallet':
+        return False
+    result = db["wallets"].delete_one({"user_id": user_id, "wallet": wallet_name})
+    if result.deleted_count > 0:
+        db["expenses"].delete_many({"user_id": user_id, "wallet": wallet_name})
+        return True
+    return False
