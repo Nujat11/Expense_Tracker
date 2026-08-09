@@ -337,9 +337,9 @@ function Dashboard() {
               </div>
 
               <div className="wallet-section" style={{ gridColumn: '1 / -1' }}>
-                <div style={{ display: 'grid', gap: '18px', gridTemplateColumns: '1.35fr 1fr' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '18px' }}>
                   <div className="wallet-list-panel">
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', gap: '12px', marginBottom: '12px' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '12px', marginBottom: '12px' }}>
                       <div>
                         <label style={{ fontSize: '0.8rem', color: '#aaa', display: 'block' }}>Wallet View</label>
                         <div style={{ color: '#fff', fontWeight: 700, marginTop: 4 }}>Choose a wallet</div>
@@ -368,9 +368,9 @@ function Dashboard() {
                     )}
                   </div>
 
-                  <div className="wallet-add-row">
+                  <div className="wallet-add-row" style={{ maxWidth: '100%' }}>
                     <label style={{ fontSize: '0.8rem', color: '#aaa', display: 'block', marginBottom: '8px' }}>Add Wallet</label>
-                    <div style={{ display: 'flex', gap: '8px', width: '100%', maxWidth: '380px' }}>
+                    <div style={{ display: 'flex', gap: '8px', width: '100%', maxWidth: '520px' }}>
                       <input
                         type="text"
                         className="input-glass"
