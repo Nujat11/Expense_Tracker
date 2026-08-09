@@ -167,14 +167,14 @@ body::before {
 }
 
 .wallet-tab-group-primary {
-  min-width: 160px;
+  min-width: 120px;
 }
 
 .wallet-tab-group-secondary {
   display: flex;
   flex-wrap: wrap;
-  gap: 10px;
-  justify-content: flex-end;
+  gap: 8px;
+  justify-content: flex-start;
   flex: 1;
 }
 
