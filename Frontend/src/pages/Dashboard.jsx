@@ -418,7 +418,8 @@ function Dashboard() {
                 </div>
               </div>
 
-                <label style={{ fontSize: '0.8rem', color: '#aaa', display: 'block', marginBottom: '6px' }}>Filter Category</label>
+                <div>
+                  <label style={{ fontSize: '0.8rem', color: '#aaa', display: 'block', marginBottom: '6px' }}>Filter Category</label>
                 <select 
                   className="input-glass" 
                   style={{ marginBottom: 0, padding: '8px 12px', fontSize: '0.85rem' }}
