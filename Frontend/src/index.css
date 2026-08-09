@@ -23,6 +23,10 @@
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
+html {
+  -webkit-text-size-adjust: 100%;
+  -ms-text-size-adjust: 100%;
+}
 body {
   font-family: 'Inter', sans-serif;
   background: var(--bg-gradient);
@@ -78,6 +82,14 @@ body::before {
   padding: 14px 18px;
   border-radius: 12px;
   width: 100%;
+  font-size: 16px;
+}
+button,
+input,
+textarea,
+select {
+  font-size: 16px;
+}
   outline: none;
   transition: var(--transition);
   font-size: 0.95rem;
@@ -448,6 +460,7 @@ body::before {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  min-height: 64px;
   padding: 18px 48px;
   background: rgba(10, 8, 18, 0.6);
   backdrop-filter: blur(20px);
@@ -458,6 +471,8 @@ body::before {
   z-index: 100;
 }
 .navbar-brand {
+  flex: 1;
+  min-width: 0;
   font-size: 1.4rem;
   font-weight: 800;
   background: linear-gradient(90deg, #a99ffe, #00d4aa);
@@ -465,8 +480,11 @@ body::before {
   -webkit-text-fill-color: transparent;
   background-clip: text;
   letter-spacing: -0.5px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
-.navbar-right { display: flex; align-items: center; gap: 16px; }
+.navbar-right { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; justify-content: flex-end; }
 .navbar-user {
   font-size: 0.85rem;
   color: var(--text-secondary);
@@ -478,7 +496,8 @@ body::before {
 
 @media (max-width: 640px) {
   .navbar {
-    padding: 12px 12px;
+    padding: 12px 16px;
+    min-height: 72px;
   }
   .navbar-brand { font-size: 1.05rem; }
   .navbar-right {
@@ -490,7 +509,7 @@ body::before {
   .navbar-right > * { flex: none; }
   .navbar-right button, .navbar-right .navbar-user {
     padding: 6px 10px;
-    font-size: 0.85rem;
+    font-size: 0.95rem;
   }
 }
 
