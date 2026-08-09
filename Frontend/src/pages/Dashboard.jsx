@@ -273,8 +273,8 @@ function Dashboard() {
         </div>
 
         {/* Budget limit progress bar */}
-        <div className="glass-panel" style={{ marginBottom: '40px', padding: '20px 24px' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+        <div className="glass-panel budget-panel" style={{ marginBottom: '40px', padding: '20px 24px' }}>
+          <div className="budget-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
             <h3 className="section-title" style={{ fontSize: '1.25rem' }}>Monthly Spending Limit</h3>
             <div>
               {isEditingBudget ? (
