@@ -277,6 +277,30 @@ body::before {
     color: #00d4ff;
   }
 
+  .wallet-delete-target {
+    margin-top: 18px;
+    padding: 16px 18px;
+    border-radius: 16px;
+    text-align: center;
+    border: 1px dashed rgba(255,255,255,0.2);
+    background: rgba(255,255,255,0.03);
+    color: #cacedb;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+  }
+
+  .wallet-delete-target.visible {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .wallet-delete-target.active {
+    border-color: rgba(255, 77, 109, 0.85);
+    background: rgba(255, 77, 109, 0.14);
+    color: #ffb3bb;
+  }
+
   .wallets-list-container {
     display: grid;
     gap: 14px;

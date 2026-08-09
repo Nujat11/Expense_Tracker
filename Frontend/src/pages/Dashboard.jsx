@@ -18,6 +18,8 @@ function Dashboard() {
   const [newWalletName, setNewWalletName] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [expenseToEdit, setExpenseToEdit] = useState(null);
+  const [draggedWallet, setDraggedWallet] = useState(null);
+  const [deleteHovering, setDeleteHovering] = useState(false);
   
   // Budget values
   const [budgetLimit, setBudgetLimit] = useState(2000);
@@ -358,6 +360,9 @@ function Dashboard() {
                             key={w.wallet}
                             type="button"
                             className="wallet-list-item"
+                            draggable
+                            onDragStart={() => { setDraggedWallet(w.wallet); setDeleteHovering(false); }}
+                            onDragEnd={() => { setDraggedWallet(null); setDeleteHovering(false); }}
                             onClick={() => navigate(`/wallet/${encodeURIComponent(w.wallet)}`)}
                           >
                             <span>{w.wallet}</span>
@@ -366,6 +371,25 @@ function Dashboard() {
                         ))}
                       </div>
                     )}
+
+                    <div
+                      className={`wallet-delete-target ${draggedWallet ? 'visible' : ''} ${deleteHovering ? 'active' : ''}`}
+                      onDragOver={(e) => {
+                        e.preventDefault();
+                        if (draggedWallet) setDeleteHovering(true);
+                      }}
+                      onDragLeave={() => setDeleteHovering(false)}
+                      onDrop={(e) => {
+                        e.preventDefault();
+                        if (draggedWallet) {
+                          setDeleteHovering(false);
+                          handleDeleteWallet(draggedWallet);
+                          setDraggedWallet(null);
+                        }
+                      }}
+                    >
+                      {draggedWallet ? `Drop "${draggedWallet}" here to delete` : 'Drag a wallet here to delete'}
+                    </div>
                   </div>
 
                   <div className="wallet-add-row" style={{ maxWidth: '100%' }}>
