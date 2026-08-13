@@ -12,6 +12,7 @@ const CATEGORY_ICONS = {
 
 function Dashboard() {
   const [user, setUser] = useState(null);
+  const [confirmModal, setConfirmModal] = useState({ show: false, title: '', message: '', onConfirm: null, onCancel: null });
   const [toast, setToast] = useState({ show: false, message: '', type: 'error' });
   const toastTimeoutRef = useRef(null);
 
@@ -112,21 +113,29 @@ function Dashboard() {
 
   const handleDeleteWallet = async (walletName) => {
     if (!walletName || walletName === 'Main Wallet') return;
-    if (!window.confirm(`Delete wallet "${walletName}" and all its transactions?`)) {
-      return;
-    }
-    try {
-      await dataService.deleteWallet(user.id, walletName);
-      if (walletFilter === walletName) {
-        setWalletFilter('Main Wallet');
+    setConfirmModal({
+      show: true,
+      title: '🗑️ Delete Wallet',
+      message: `Are you sure you want to delete the wallet "${walletName}" and all its transactions? This action is permanent and cannot be undone.`,
+      onConfirm: async () => {
+        try {
+          await dataService.deleteWallet(user.id, walletName);
+          if (walletFilter === walletName) {
+            setWalletFilter('Main Wallet');
+          }
+          fetchTransactions(user.id);
+          fetchWallets(user.id);
+          showToast('Wallet deleted successfully!', 'success');
+        } catch (err) {
+          console.error('Error deleting wallet', err);
+          showToast(err.response?.data?.detail || err.message || 'Unable to delete wallet', 'error');
+        }
+        setConfirmModal(prev => ({ ...prev, show: false }));
+      },
+      onCancel: () => {
+        setConfirmModal(prev => ({ ...prev, show: false }));
       }
-      fetchTransactions(user.id);
-      fetchWallets(user.id);
-      showToast('Wallet deleted successfully!', 'success');
-    } catch (err) {
-      console.error('Error deleting wallet', err);
-      showToast(err.response?.data?.detail || err.message || 'Unable to delete wallet', 'error');
-    }
+    });
   };
 
   const closeContextMenu = () => setContextMenu((prev) => ({ ...prev, open: false }));
@@ -170,15 +179,26 @@ function Dashboard() {
     }
   };
 
-  const handleDelete = async (id) => {
-    try {
-      await dataService.deleteExpense(id);
-      fetchTransactions(user.id);
-      showToast('Transaction deleted successfully!', 'success');
-    } catch (err) {
-      console.error('Error deleting expense', err);
-      showToast(err.response?.data?.detail || err.message || 'Unable to delete transaction', 'error');
-    }
+  const handleDelete = (id, title) => {
+    setConfirmModal({
+      show: true,
+      title: '🗑️ Delete Transaction',
+      message: `Are you sure you want to delete the transaction "${title}"? This action cannot be undone.`,
+      onConfirm: async () => {
+        try {
+          await dataService.deleteExpense(id);
+          fetchTransactions(user.id);
+          showToast('Transaction deleted successfully!', 'success');
+        } catch (err) {
+          console.error('Error deleting expense', err);
+          showToast(err.response?.data?.detail || err.message || 'Unable to delete transaction', 'error');
+        }
+        setConfirmModal(prev => ({ ...prev, show: false }));
+      },
+      onCancel: () => {
+        setConfirmModal(prev => ({ ...prev, show: false }));
+      }
+    });
   };
 
   const saveBudget = () => {
@@ -542,7 +562,7 @@ function Dashboard() {
                     </div>
                     <div className="t-actions">
                       <button className="btn-edit" onClick={() => openEditModal(t)}>Edit</button>
-                      <button className="btn-del" onClick={() => handleDelete(t.id)}>Del</button>
+                      <button className="btn-del" onClick={() => handleDelete(t.id, t.title)}>Del</button>
                     </div>
                   </div>
                 ))
@@ -576,6 +596,28 @@ function Dashboard() {
         expenseToEdit={expenseToEdit}
         wallets={wallets}
       />
+
+      {confirmModal.show && (
+        <div className="modal-overlay" onClick={confirmModal.onCancel}>
+          <div className="glass-panel modal-content confirm-modal-content" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h3 className="section-title text-danger">{confirmModal.title}</h3>
+              <button className="close-btn" onClick={confirmModal.onCancel}>✕</button>
+            </div>
+            <div style={{ marginBottom: '24px', color: '#cacedb', lineHeight: '1.6', fontSize: '0.95rem', textAlign: 'left' }}>
+              {confirmModal.message}
+            </div>
+            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px' }}>
+              <button className="btn-edit" style={{ padding: '10px 20px', fontSize: '0.9rem', marginBottom: 0 }} onClick={confirmModal.onCancel}>
+                Cancel
+              </button>
+              <button className="btn-danger" style={{ padding: '10px 24px', fontSize: '0.9rem', width: 'auto', marginBottom: 0 }} onClick={confirmModal.onConfirm}>
+                Confirm
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {toast.show && (
         <div className={`toast-notification toast-${toast.type}`}>

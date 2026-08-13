@@ -1255,3 +1255,11 @@ input[type="date"].input-glass::-webkit-calendar-picker-indicator {
     max-width: none;
   }
 }
+
+/* ====== CONFIRMATION MODAL ====== */
+.confirm-modal-content {
+  max-width: 420px;
+}
+.text-danger {
+  color: var(--expense-color) !important;
+}
