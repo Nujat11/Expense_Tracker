@@ -5,13 +5,8 @@ This document provides the technical roadmap for building the **Personal Expense
 
 ## 2. Technology Choices
 - **Frontend Stack:** React, CSS, Recharts (for visualization).
-<<<<<<< HEAD
 - **Backend Stack:** Python, FastAPI, PyMongo (NoSQL client).
 - **Database:** MongoDB (NoSQL Database).
-=======
-- **Backend Stack:** Python, FastAPI, JSON File Store (`store.py`).
-- **Database:** JSON File Storage (`data.json`).
->>>>>>> main
 - **Hosting:** Netlify (Frontend) and Render (Backend).
 
 ## 3. Design Principles
