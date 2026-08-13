@@ -210,13 +210,6 @@ function Dashboard() {
     }
   };
 
-  const handleSeedData = () => {
-    if (user) {
-      dataService.seedMockData(user.id);
-      fetchTransactions(user.id);
-      fetchWallets(user.id);
-    }
-  };
 
   const openAddModal = () => {
     setExpenseToEdit(null);
@@ -277,15 +270,7 @@ function Dashboard() {
             <div className="welcome-sub">{today}</div>
           </div>
           <div style={{ display: 'flex', gap: '10px' }}>
-            {storageMode === 'local' && (
-              <button 
-                className="btn-edit" 
-                style={{ padding: '8px 16px', background: 'rgba(0, 212, 255, 0.1)', color: '#00d4ff', border: '1px solid rgba(0, 212, 255, 0.2)' }}
-                onClick={handleSeedData}
-              >
-                ⚡ Load Sample Data
-              </button>
-            )}
+
             <button className="btn-primary btn-small" onClick={openAddModal} style={{ width: 'auto', padding: '10px 20px' }}>
               + Add Transaction
             </button>
