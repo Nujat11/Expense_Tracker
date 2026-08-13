@@ -527,7 +527,7 @@ function Dashboard() {
               {filteredTransactions.length === 0 ? (
                 <div className="empty-state">
                   <div className="empty-state-icon">📭</div>
-                  <p>No matching transactions found.<br />Add a transaction or seed mock data to get started!</p>
+                  <p>No matching transactions found.<br />Add a transaction to get started!</p>
                 </div>
               ) : (
                 filteredTransactions.map((t) => (
