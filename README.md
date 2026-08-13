@@ -18,6 +18,7 @@ A modern, full-stack web application to help individuals track daily income and 
 - **Dashboard Analytics** — Total balance, income & expense summaries with a Recharts Pie Chart for category-wise spending visualization.
 - **Budget Tracking** — Category budget progress bars to monitor spending limits.
 - **MongoDB NoSQL Storage** — Production-ready cloud document store via PyMongo + MongoDB Atlas. Atomic sequential IDs maintain full frontend compatibility.
+ - **Wallet Management** — Create, rename, and delete multiple wallets; view per-wallet transactions and summaries.
 
 ---
 
@@ -39,6 +40,8 @@ A modern, full-stack web application to help individuals track daily income and 
 - **Backend:** `render.yaml` blueprint configured for Render auto-deploy. Set `MONGO_URI` environment variable in Render dashboard to connect MongoDB Atlas.
 - **Frontend:** `netlify.toml` configured for Vite build from `Frontend/` directory with SPA redirect rules.
 - **CORS:** Configured to allow all origins for seamless cross-platform API access.
+
+
 
 ---
 

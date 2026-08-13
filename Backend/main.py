@@ -10,7 +10,7 @@ load_dotenv(os.path.join(backend_dir, ".env"))
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from routes import user_routes, expense_routes
+from routes import user_routes, expense_routes, wallet_routes
 
 
 app = FastAPI(
@@ -29,6 +29,7 @@ app.add_middleware(
 
 app.include_router(user_routes.router)
 app.include_router(expense_routes.router)
+app.include_router(wallet_routes.router)
 
 @app.get("/")
 def read_root():

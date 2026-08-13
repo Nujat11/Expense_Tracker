@@ -2,12 +2,13 @@ import { useState, useEffect } from 'react';
 
 const CATEGORIES = ['Food', 'Transport', 'Rent', 'Entertainment', 'Salary', 'Other'];
 
-function ExpenseModal({ isOpen, onClose, onSave, expenseToEdit }) {
+function ExpenseModal({ isOpen, onClose, onSave, expenseToEdit, wallets }) {
   const [title, setTitle] = useState('');
   const [amount, setAmount] = useState('');
   const [category, setCategory] = useState('Food');
   const [type, setType] = useState('Expense');
   const [date, setDate] = useState('');
+  const [wallet, setWallet] = useState('Main Wallet');
 
   useEffect(() => {
     if (expenseToEdit) {
@@ -16,20 +17,22 @@ function ExpenseModal({ isOpen, onClose, onSave, expenseToEdit }) {
       setCategory(expenseToEdit.category);
       setType(expenseToEdit.type);
       setDate(expenseToEdit.date);
+      setWallet(expenseToEdit.wallet || 'Main Wallet');
     } else {
       setTitle('');
       setAmount('');
       setCategory('Food');
       setType('Expense');
       setDate(new Date().toISOString().split('T')[0]);
+      setWallet(wallets?.[0]?.wallet || 'Main Wallet');
     }
-  }, [expenseToEdit, isOpen]);
+  }, [expenseToEdit, isOpen, wallets]);
 
   if (!isOpen) return null;
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    onSave({ title, amount: parseFloat(amount), category, type, date });
+    onSave({ title, amount: parseFloat(amount), category, type, date, wallet });
   };
 
   return (
@@ -99,6 +102,15 @@ function ExpenseModal({ isOpen, onClose, onSave, expenseToEdit }) {
                 ))}
               </select>
             </div>
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="modal-wallet">Wallet</label>
+            <select id="modal-wallet" className="input-glass" value={wallet} onChange={(e) => setWallet(e.target.value)}>
+              {(wallets || ['Main Wallet']).map((w) => (
+                <option key={w.wallet || w} value={w.wallet || w}>{w.wallet || w}</option>
+              ))}
+            </select>
           </div>
 
           <button type="submit" className="btn-primary" style={{ marginTop: '8px' }}>

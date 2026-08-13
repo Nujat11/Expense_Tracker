@@ -13,8 +13,14 @@ const CATEGORY_ICONS = {
 function Dashboard() {
   const [user, setUser] = useState(null);
   const [transactions, setTransactions] = useState([]);
+  const [wallets, setWallets] = useState([{ wallet: 'Main Wallet' }, { wallet: 'Savings Wallet' }]);
+  const [walletFilter, setWalletFilter] = useState('Main Wallet');
+  const [newWalletName, setNewWalletName] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [expenseToEdit, setExpenseToEdit] = useState(null);
+  const [draggedWallet, setDraggedWallet] = useState(null);
+  const [deleteHovering, setDeleteHovering] = useState(false);
+  const [contextMenu, setContextMenu] = useState({ wallet: null, x: 0, y: 0, open: false });
   
   // Budget values
   const [budgetLimit, setBudgetLimit] = useState(2000);
@@ -38,6 +44,7 @@ function Dashboard() {
       const parsedUser = JSON.parse(storedUser);
       setUser(parsedUser);
       fetchTransactions(parsedUser.id);
+      fetchWallets(parsedUser.id);
 
       // Load budget limit
       const storedBudget = localStorage.getItem(`budget_limit_${parsedUser.id}`);
@@ -57,6 +64,75 @@ function Dashboard() {
     }
   };
 
+  const fetchWallets = async (userId) => {
+    try {
+      const data = await dataService.getWallets(userId);
+      // Ensure canonical order: Main, Savings, then others
+      const names = data.map((w) => w.wallet || 'Main Wallet');
+      const others = Array.from(new Set(names.filter(n => n !== 'Main Wallet' && n !== 'Savings Wallet'))).sort((a,b)=>a.localeCompare(b));
+      const ordered = ['Main Wallet', 'Savings Wallet', ...others];
+      setWallets(ordered.map((walletName) => ({ wallet: walletName })));
+    } catch (err) {
+      console.error('Error fetching wallets', err);
+      setWallets([{ wallet: 'Main Wallet' }, { wallet: 'Savings Wallet' }]);
+    }
+  };
+
+  const handleCreateWallet = async () => {
+    if (!newWalletName.trim()) {
+      return;
+    }
+    try {
+      await dataService.createWallet(user.id, newWalletName);
+      setNewWalletName('');
+      fetchWallets(user.id);
+      setWalletFilter(newWalletName.trim());
+    } catch (err) {
+      console.error('Error creating wallet', err);
+      alert(err.message || 'Unable to create wallet');
+    }
+  };
+
+  const handleDeleteWallet = async (walletName) => {
+    if (!walletName || walletName === 'Main Wallet') return;
+    if (!window.confirm(`Delete wallet "${walletName}" and all its transactions?`)) {
+      return;
+    }
+    try {
+      await dataService.deleteWallet(user.id, walletName);
+      if (walletFilter === walletName) {
+        setWalletFilter('Main Wallet');
+      }
+      fetchTransactions(user.id);
+      fetchWallets(user.id);
+    } catch (err) {
+      console.error('Error deleting wallet', err);
+      alert(err.message || 'Unable to delete wallet');
+    }
+  };
+
+  const closeContextMenu = () => setContextMenu((prev) => ({ ...prev, open: false }));
+
+  const handleWalletContextMenu = (e, walletName) => {
+    e.preventDefault();
+    if (walletName === 'Main Wallet') return;
+    setContextMenu({ wallet: walletName, x: e.pageX, y: e.pageY, open: true });
+  };
+
+  useEffect(() => {
+    const closeOnOutside = () => {
+      if (contextMenu.open) closeContextMenu();
+    };
+
+    window.addEventListener('mousedown', closeOnOutside);
+    window.addEventListener('scroll', closeOnOutside);
+
+    return () => {
+      window.removeEventListener('mousedown', closeOnOutside);
+      window.removeEventListener('scroll', closeOnOutside);
+    };
+  }, [contextMenu.open]);
+
   const handleSave = async (expenseData) => {
     try {
       if (expenseToEdit) {
@@ -67,6 +143,7 @@ function Dashboard() {
       setIsModalOpen(false);
       setExpenseToEdit(null);
       fetchTransactions(user.id);
+      fetchWallets(user.id);
     } catch (err) {
       console.error('Error saving expense', err);
     }
@@ -94,6 +171,7 @@ function Dashboard() {
     if (user) {
       dataService.seedMockData(user.id);
       fetchTransactions(user.id);
+      fetchWallets(user.id);
     }
   };
 
@@ -108,18 +186,15 @@ function Dashboard() {
   };
 
   // Calculations
-  const totalIncome = transactions.filter(t => t.type === 'Income').reduce((acc, curr) => acc + curr.amount, 0);
-  const totalExpense = transactions.filter(t => t.type === 'Expense').reduce((acc, curr) => acc + curr.amount, 0);
-  const balance = totalIncome - totalExpense;
-  const percentSpent = budgetLimit > 0 ? (totalExpense / budgetLimit) * 100 : 0;
+  const visibleWallets = wallets.filter(w => w.wallet !== 'Main Wallet' && w.wallet !== 'Savings Wallet');
 
-  // Filter & Sort implementation
   const filteredTransactions = transactions
     .filter(t => {
       const matchesSearch = t.title.toLowerCase().includes(searchQuery.toLowerCase());
       const matchesCategory = categoryFilter === 'All' || t.category === categoryFilter;
       const matchesType = typeFilter === 'All' || t.type === typeFilter;
-      return matchesSearch && matchesCategory && matchesType;
+      const matchesWallet = walletFilter === 'Main Wallet' ? true : t.wallet === walletFilter;
+      return matchesSearch && matchesCategory && matchesType && matchesWallet;
     })
     .sort((a, b) => {
       if (sortBy === 'date_desc') {
@@ -136,6 +211,11 @@ function Dashboard() {
       }
       return 0;
     });
+
+  const totalIncome = filteredTransactions.filter(t => t.type === 'Income').reduce((acc, curr) => acc + curr.amount, 0);
+  const totalExpense = filteredTransactions.filter(t => t.type === 'Expense').reduce((acc, curr) => acc + curr.amount, 0);
+  const balance = totalIncome - totalExpense;
+  const percentSpent = budgetLimit > 0 ? (totalExpense / budgetLimit) * 100 : 0;
 
   const fmt = (n) => `৳ ${n.toLocaleString('en-BD', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 
@@ -254,16 +334,7 @@ function Dashboard() {
             </div>
 
             {/* Filter and Sorting Controls Pane */}
-            <div style={{ 
-              display: 'grid', 
-              gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', 
-              gap: '12px', 
-              marginBottom: '20px',
-              background: 'rgba(0,0,0,0.2)',
-              padding: '15px',
-              borderRadius: '12px',
-              border: '1px solid rgba(255,255,255,0.03)'
-            }}>
+            <div className="filter-panel">
               <div>
                 <label style={{ fontSize: '0.8rem', color: '#aaa', display: 'block', marginBottom: '6px' }}>Search Title</label>
                 <input 
@@ -290,8 +361,108 @@ function Dashboard() {
                 </select>
               </div>
 
-              <div>
-                <label style={{ fontSize: '0.8rem', color: '#aaa', display: 'block', marginBottom: '6px' }}>Filter Category</label>
+              <div className="wallet-section" style={{ gridColumn: '1 / -1' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '18px' }}>
+                  <div className="wallet-list-panel">
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '12px', marginBottom: '12px' }}>
+                      <div>
+                        <label style={{ fontSize: '0.8rem', color: '#aaa', display: 'block' }}>Wallet View</label>
+                        <div style={{ color: '#fff', fontWeight: 700, marginTop: 4 }}>Choose a wallet</div>
+                      </div>
+                      <button type="button" className="btn-primary btn-small" style={{ padding: '6px 10px', fontSize: '0.8rem' }} onClick={() => navigate('/wallets')}>View All Wallets</button>
+                    </div>
+
+                    {visibleWallets.length === 0 ? (
+                      <div className="empty-state" style={{ padding: '18px 14px', textAlign: 'center' }}>
+                        No individual wallets available yet.
+                      </div>
+                    ) : (
+                      <div style={{ display: 'grid', gap: '10px' }}>
+                        {visibleWallets.map((w) => (
+                          <button
+                            key={w.wallet}
+                            type="button"
+                            className="wallet-list-item"
+                            draggable
+                            onDragStart={() => { setDraggedWallet(w.wallet); setDeleteHovering(false); }}
+                            onDragEnd={() => { setDraggedWallet(null); setDeleteHovering(false); }}
+                            onContextMenu={(e) => handleWalletContextMenu(e, w.wallet)}
+                            onClick={() => navigate(`/wallet/${encodeURIComponent(w.wallet)}`)}
+                          >
+                            <span>{w.wallet}</span>
+                            <span>›</span>
+                          </button>
+                        ))}
+                      </div>
+                    )}
+
+                    <div
+                      className={`wallet-delete-target ${draggedWallet ? 'visible' : ''} ${deleteHovering ? 'active' : ''}`}
+                      onDragOver={(e) => {
+                        e.preventDefault();
+                        if (draggedWallet) setDeleteHovering(true);
+                      }}
+                      onDragLeave={() => setDeleteHovering(false)}
+                      onDrop={(e) => {
+                        e.preventDefault();
+                        if (draggedWallet) {
+                          setDeleteHovering(false);
+                          handleDeleteWallet(draggedWallet);
+                          setDraggedWallet(null);
+                        }
+                      }}
+                    >
+                      {draggedWallet ? `Drop "${draggedWallet}" here to delete` : 'Drag a wallet here to delete'}
+                    </div>
+
+                    {contextMenu.open && (
+                      <div
+                        className="wallet-context-menu"
+                        style={{ left: contextMenu.x, top: contextMenu.y }}
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        <button
+                          type="button"
+                          className="wallet-context-menu-item"
+                          onClick={() => {
+                            handleDeleteWallet(contextMenu.wallet);
+                            closeContextMenu();
+                          }}
+                        >
+                          Delete "{contextMenu.wallet}"
+                        </button>
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="wallet-add-row" style={{ maxWidth: '100%' }}>
+                    <label style={{ fontSize: '0.8rem', color: '#aaa', display: 'block', marginBottom: '8px' }}>Add Wallet</label>
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 160px', gap: '12px', width: '100%', alignItems: 'center' }}>
+                      <input
+                        type="text"
+                        className="input-glass"
+                        style={{ padding: '12px 16px', fontSize: '1rem', width: '100%', marginBottom: 0 }}
+                        placeholder="New wallet name"
+                        value={newWalletName}
+                        onChange={(e) => setNewWalletName(e.target.value)}
+                      />
+                      <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                        <button
+                          type="button"
+                          className="btn-primary btn-small"
+                          style={{ whiteSpace: 'nowrap', padding: '12px 28px', width: '100%', maxWidth: '160px' }}
+                          onClick={handleCreateWallet}
+                        >
+                          Create
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+                <div>
+                  <label style={{ fontSize: '0.8rem', color: '#aaa', display: 'block', marginBottom: '6px' }}>Filter Category</label>
                 <select 
                   className="input-glass" 
                   style={{ marginBottom: 0, padding: '8px 12px', fontSize: '0.85rem' }}
@@ -338,7 +509,7 @@ function Dashboard() {
                     </div>
                     <div className="t-info">
                       <div className="t-title">{t.title}</div>
-                      <span className="t-cat">{t.category}</span>
+                      <span className="t-cat">{t.category} · {t.wallet || 'Main Wallet'}</span>
                     </div>
                     <div className="t-right" style={{ marginRight: '15px' }}>
                       <div className={`t-amt ${t.type === 'Income' ? 'income' : 'expense'}`}>
@@ -380,6 +551,7 @@ function Dashboard() {
         onClose={() => setIsModalOpen(false)}
         onSave={handleSave}
         expenseToEdit={expenseToEdit}
+        wallets={wallets}
       />
     </>
   );
