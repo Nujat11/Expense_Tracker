@@ -600,19 +600,19 @@ function Dashboard() {
       {confirmModal.show && (
         <div className="modal-overlay" onClick={confirmModal.onCancel}>
           <div className="glass-panel modal-content confirm-modal-content" onClick={(e) => e.stopPropagation()}>
-            <div className="modal-header">
-              <h3 className="section-title text-danger">{confirmModal.title}</h3>
-              <button className="close-btn" onClick={confirmModal.onCancel}>✕</button>
+            <div className="confirm-modal-icon-wrap">
+              <span className="confirm-modal-icon">⚠️</span>
             </div>
-            <div style={{ marginBottom: '24px', color: '#cacedb', lineHeight: '1.6', fontSize: '0.95rem', textAlign: 'left' }}>
+            <h3 className="confirm-modal-title">{confirmModal.title}</h3>
+            <p className="confirm-modal-message">
               {confirmModal.message}
-            </div>
-            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px' }}>
-              <button className="btn-edit" style={{ padding: '10px 20px', fontSize: '0.9rem', marginBottom: 0 }} onClick={confirmModal.onCancel}>
+            </p>
+            <div className="confirm-modal-actions">
+              <button className="confirm-btn-cancel" onClick={confirmModal.onCancel}>
                 Cancel
               </button>
-              <button className="btn-danger" style={{ padding: '10px 24px', fontSize: '0.9rem', width: 'auto', marginBottom: 0 }} onClick={confirmModal.onConfirm}>
-                Confirm
+              <button className="confirm-btn-action" onClick={confirmModal.onConfirm}>
+                Delete
               </button>
             </div>
           </div>
