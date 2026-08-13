@@ -50,7 +50,7 @@ function Navbar() {
             title="Click to toggle storage mode"
             className={`navbar-toggle-btn ${mode === 'local' ? 'mode-local' : 'mode-api'}`}
           >
-            {mode === 'local' ? '🔒 Offline Mode' : '🌐 Online Mode'}
+            {mode === 'local' ? '🔒 Offline' : '🌐 Online'}
           </button>
         )}
         {user?.name && (

@@ -105,7 +105,7 @@ function Login() {
         <div className="auth-box">
           <div className="auth-box-header">
             <h1>Welcome back</h1>
-            <p>Sign in to manage your expenses {mode === 'local' ? '(Offline Mode)' : '(Online Mode)'}</p>
+            <p>Sign in to manage your expenses {mode === 'local' ? '(Offline)' : '(Online)'}</p>
           </div>
 
           {/* Storage Mode Toggle Pill */}
@@ -133,7 +133,7 @@ function Login() {
                 transition: 'all 0.3s'
               }}
             >
-              🔒 Offline Mode
+              🔒 Offline
             </button>
             <button 
               type="button" 
@@ -151,7 +151,7 @@ function Login() {
                 transition: 'all 0.3s'
               }}
             >
-              🌐 Online Mode
+              🌐 Online
             </button>
           </div>
 
