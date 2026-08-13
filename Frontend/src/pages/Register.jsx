@@ -96,7 +96,7 @@ function Register() {
         <div className="auth-box">
           <div className="auth-box-header">
             <h1>Create account</h1>
-            <p>Free forever {mode === 'local' ? '(Local Mode)' : '(API Mode)'}</p>
+            <p>Free forever {mode === 'local' ? '(Offline Mode)' : '(Online Mode)'}</p>
           </div>
 
           {/* Storage Mode Toggle Pill */}
@@ -124,7 +124,7 @@ function Register() {
                 transition: 'all 0.3s'
               }}
             >
-              🔒 Local Storage
+              🔒 Offline Mode
             </button>
             <button 
               type="button" 
@@ -142,7 +142,7 @@ function Register() {
                 transition: 'all 0.3s'
               }}
             >
-              🌐 API Server
+              🌐 Online Mode
             </button>
           </div>
 
