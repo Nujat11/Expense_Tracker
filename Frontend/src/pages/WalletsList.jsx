@@ -40,10 +40,13 @@ function WalletsList() {
     <>
       <Navbar />
       <div className="dashboard-container">
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 18 }}>
+        <div className="dashboard-header-row" style={{ marginBottom: 18 }}>
           <div>
             <div className="welcome-msg">All Wallets</div>
             <div className="welcome-sub">Tap a wallet to view its transactions and chart</div>
+          </div>
+          <div>
+            <button className="btn-primary btn-small" onClick={() => navigate('/dashboard')}>Back to Dashboard</button>
           </div>
         </div>
 

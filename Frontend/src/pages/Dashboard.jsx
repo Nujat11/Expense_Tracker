@@ -228,9 +228,9 @@ function Dashboard() {
       <Navbar />
       <div className="dashboard-container">
         
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '15px', marginBottom: '30px' }}>
+        <div className="dashboard-header-row">
           <div>
-            <div className="welcome-msg" style={{ marginBottom: 0 }}>Hello, <span>{user.name}</span>! 👋</div>
+            <div className="welcome-msg">Hello, <span>{user.name}</span>! 👋</div>
             <div className="welcome-sub">{today}</div>
           </div>
           <div style={{ display: 'flex', gap: '10px' }}>
@@ -437,7 +437,7 @@ function Dashboard() {
 
                   <div className="wallet-add-row" style={{ maxWidth: '100%' }}>
                     <label style={{ fontSize: '0.8rem', color: '#aaa', display: 'block', marginBottom: '8px' }}>Add Wallet</label>
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 160px', gap: '12px', width: '100%', alignItems: 'center' }}>
+                    <div className="wallet-add-grid">
                       <input
                         type="text"
                         className="input-glass"
@@ -511,7 +511,7 @@ function Dashboard() {
                       <div className="t-title">{t.title}</div>
                       <span className="t-cat">{t.category} · {t.wallet || 'Main Wallet'}</span>
                     </div>
-                    <div className="t-right" style={{ marginRight: '15px' }}>
+                    <div className="t-right">
                       <div className={`t-amt ${t.type === 'Income' ? 'income' : 'expense'}`}>
                         {t.type === 'Income' ? '+' : '-'}{fmt(t.amount)}
                       </div>

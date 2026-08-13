@@ -83,19 +83,17 @@ body::before {
   padding: 14px 18px;
   border-radius: 12px;
   width: 100%;
-  font-size: 16px;
+  outline: none;
+  transition: var(--transition);
+  font-size: 0.95rem;
+  font-family: 'Inter', sans-serif;
+  letter-spacing: 0.01em;
 }
 button,
 input,
 textarea,
 select {
   font-size: 16px;
-}
-  outline: none;
-  transition: var(--transition);
-  font-size: 0.95rem;
-  font-family: 'Inter', sans-serif;
-  letter-spacing: 0.01em;
 }
 .input-glass:focus {
   border-color: var(--accent-color);
@@ -1039,3 +1037,141 @@ input[type="date"].input-glass::-webkit-calendar-picker-indicator {
 }
 .badge-income { background: rgba(0, 212, 170, 0.12); color: var(--income-color); border: 1px solid rgba(0, 212, 170, 0.2); }
 .badge-expense { background: rgba(255, 107, 138, 0.12); color: var(--expense-color); border: 1px solid rgba(255, 107, 138, 0.2); }
+
+/* ====== RESPONSIVE LAYOUT & MOBILE OPTIMIZATIONS ====== */
+
+/* Header Row styling */
+.dashboard-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-bottom: 30px;
+}
+
+/* Wallet Add Grid styling */
+.wallet-add-grid {
+  display: grid;
+  grid-template-columns: 1fr 160px;
+  gap: 12px;
+  width: 100%;
+  align-items: center;
+}
+
+/* Navbar Storage Toggle Button styling */
+.navbar-toggle-btn {
+  font-size: 0.85rem;
+  padding: 6px 12px;
+  border-radius: 15px;
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+}
+.navbar-toggle-btn.mode-local {
+  color: #00d4ff;
+}
+.navbar-toggle-btn.mode-api {
+  color: #2ecc71;
+}
+
+/* Margin on t-right only for desktop to keep layout clean */
+@media (min-width: 601px) {
+  .transaction-item .t-right {
+    margin-right: 15px;
+  }
+}
+
+/* Global Media Query overrides for max-width: 900px */
+@media (max-width: 900px) {
+  /* Restructure filter panel to be a grid of columns rather than a single column */
+  .filter-panel {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 12px;
+  }
+  .filter-panel .wallet-section {
+    grid-column: 1 / -1;
+  }
+}
+
+/* Global Media Query overrides for max-width: 640px */
+@media (max-width: 640px) {
+  .dashboard-container {
+    padding: 20px 16px;
+  }
+  .welcome-msg {
+    font-size: 1.6rem;
+  }
+  .dashboard-header-row {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+  .dashboard-header-row > div:last-child {
+    display: flex;
+    justify-content: flex-start;
+    gap: 8px;
+    width: 100%;
+  }
+  .dashboard-header-row > div:last-child > button {
+    flex: 1;
+    width: 100%;
+    text-align: center;
+  }
+  .navbar-toggle-btn {
+    padding: 5px 10px;
+    font-size: 0.8rem;
+  }
+}
+
+/* Global Media Query overrides for max-width: 600px */
+@media (max-width: 600px) {
+  /* Wrap transaction items neatly to fit mobile screens */
+  .transaction-item {
+    flex-wrap: wrap;
+    padding: 12px 10px;
+    gap: 8px 12px;
+  }
+  .transaction-item .t-info {
+    flex: 1 1 50%;
+    min-width: 140px;
+  }
+  .transaction-item .t-right {
+    flex: 1 1 auto;
+    text-align: right;
+    margin-right: 0 !important;
+  }
+  .transaction-item .t-actions {
+    flex: 1 1 100%;
+    justify-content: flex-end;
+    margin-top: 4px;
+    border-top: 1px solid rgba(255,255,255,0.03);
+    padding-top: 6px;
+  }
+  .transaction-item .t-actions button {
+    flex: 1;
+    text-align: center;
+  }
+}
+
+/* Global Media Query overrides for max-width: 480px */
+@media (max-width: 480px) {
+  .filter-panel {
+    grid-template-columns: 1fr;
+  }
+  .wallet-add-grid {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+  .wallet-add-grid button {
+    width: 100% !important;
+    max-width: none !important;
+  }
+  .flex-row {
+    flex-direction: column;
+    gap: 8px;
+  }
+}

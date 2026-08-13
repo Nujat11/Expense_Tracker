@@ -1,6 +1,17 @@
+import { useState, useEffect } from 'react';
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 
 function ExpenseChart({ data }) {
+  const [windowWidth, setWindowWidth] = useState(typeof window !== 'undefined' ? window.innerWidth : 800);
+
+  useEffect(() => {
+    const handleResize = () => setWindowWidth(window.innerWidth);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  const isMobile = windowWidth < 480;
+
   const expenses = (data || []).filter(d => d.type === 'Expense');
   
   const groupedData = expenses.reduce((acc, curr) => {
@@ -21,18 +32,18 @@ function ExpenseChart({ data }) {
   }
 
   return (
-    <ResponsiveContainer width="100%" height={300}>
+    <ResponsiveContainer width="100%" height={isMobile ? 260 : 300}>
       <PieChart>
         <Pie
           data={chartData}
           cx="50%"
           cy="50%"
           labelLine={false}
-          outerRadius={100}
+          outerRadius={isMobile ? 65 : 100}
           fill="#8884d8"
           dataKey="value"
           isAnimationActive={true}
-          label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+          label={isMobile ? null : ({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
         >
           {chartData.map((entry, index) => (
             <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
@@ -43,7 +54,7 @@ function ExpenseChart({ data }) {
           contentStyle={{ backgroundColor: 'rgba(0,0,0,0.85)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px', color: '#fff' }} 
           itemStyle={{ color: '#fff' }} 
         />
-        <Legend wrapperStyle={{ paddingTop: '20px' }} />
+        <Legend wrapperStyle={{ paddingTop: isMobile ? '5px' : '20px', fontSize: isMobile ? '12px' : '14px' }} />
       </PieChart>
     </ResponsiveContainer>
   );

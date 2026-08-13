@@ -23,8 +23,14 @@ function Navbar() {
 
   return (
     <nav className="navbar">
-      <div className="navbar-brand">💰 Expense Tracker</div>
-      <div className="navbar-right" style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
+      <div 
+        className="navbar-brand" 
+        style={{ cursor: 'pointer' }} 
+        onClick={() => navigate('/dashboard')}
+      >
+        💰 Expense Tracker
+      </div>
+      <div className="navbar-right">
         {mode && (
           <button
             onClick={async () => {
@@ -42,16 +48,7 @@ function Navbar() {
               }
             }}
             title="Click to toggle storage mode"
-            style={{ 
-              fontSize: '0.85rem', 
-              padding: '6px 12px', 
-              borderRadius: '15px', 
-              background: 'rgba(0, 0, 0, 0.2)', 
-              border: '1px solid rgba(255, 255, 255, 0.05)',
-              color: mode === 'local' ? '#00d4ff' : '#2ecc71',
-              fontWeight: '600',
-              cursor: 'pointer'
-            }}
+            className={`navbar-toggle-btn ${mode === 'local' ? 'mode-local' : 'mode-api'}`}
           >
             {mode === 'local' ? '🔒 Browser Local Storage' : '🌐 API Mode'}
           </button>
@@ -59,7 +56,7 @@ function Navbar() {
         {user?.name && (
           <div className="navbar-user">👋 {user.name}</div>
         )}
-        <button className="btn-danger" style={{ padding: '8px 16px' }} onClick={handleLogout}>Logout</button>
+        <button className="btn-danger" onClick={handleLogout}>Logout</button>
       </div>
     </nav>
   );
