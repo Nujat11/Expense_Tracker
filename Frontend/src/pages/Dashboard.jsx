@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import ExpenseModal from '../components/ExpenseModal';
@@ -12,6 +12,22 @@ const CATEGORY_ICONS = {
 
 function Dashboard() {
   const [user, setUser] = useState(null);
+  const [toast, setToast] = useState({ show: false, message: '', type: 'error' });
+  const toastTimeoutRef = useRef(null);
+
+  const showToast = (message, type = 'error') => {
+    setToast({ show: true, message, type });
+    if (toastTimeoutRef.current) clearTimeout(toastTimeoutRef.current);
+    toastTimeoutRef.current = setTimeout(() => {
+      setToast(prev => ({ ...prev, show: false }));
+    }, 4000);
+  };
+
+  useEffect(() => {
+    return () => {
+      if (toastTimeoutRef.current) clearTimeout(toastTimeoutRef.current);
+    };
+  }, []);
   const [transactions, setTransactions] = useState([]);
   const [wallets, setWallets] = useState([{ wallet: 'Main Wallet' }, { wallet: 'Savings Wallet' }]);
   const [walletFilter, setWalletFilter] = useState('Main Wallet');
@@ -87,9 +103,10 @@ function Dashboard() {
       setNewWalletName('');
       fetchWallets(user.id);
       setWalletFilter(newWalletName.trim());
+      showToast('Wallet created successfully!', 'success');
     } catch (err) {
       console.error('Error creating wallet', err);
-      alert(err.message || 'Unable to create wallet');
+      showToast(err.response?.data?.detail || err.message || 'Unable to create wallet', 'error');
     }
   };
 
@@ -105,9 +122,10 @@ function Dashboard() {
       }
       fetchTransactions(user.id);
       fetchWallets(user.id);
+      showToast('Wallet deleted successfully!', 'success');
     } catch (err) {
       console.error('Error deleting wallet', err);
-      alert(err.message || 'Unable to delete wallet');
+      showToast(err.response?.data?.detail || err.message || 'Unable to delete wallet', 'error');
     }
   };
 
@@ -137,8 +155,10 @@ function Dashboard() {
     try {
       if (expenseToEdit) {
         await dataService.updateExpense(expenseToEdit.id, expenseData);
+        showToast('Transaction updated successfully!', 'success');
       } else {
         await dataService.createExpense(expenseData, user.id);
+        showToast('Transaction saved successfully!', 'success');
       }
       setIsModalOpen(false);
       setExpenseToEdit(null);
@@ -146,6 +166,7 @@ function Dashboard() {
       fetchWallets(user.id);
     } catch (err) {
       console.error('Error saving expense', err);
+      showToast(err.response?.data?.detail || err.message || 'Unable to save transaction', 'error');
     }
   };
 
@@ -153,8 +174,10 @@ function Dashboard() {
     try {
       await dataService.deleteExpense(id);
       fetchTransactions(user.id);
+      showToast('Transaction deleted successfully!', 'success');
     } catch (err) {
       console.error('Error deleting expense', err);
+      showToast(err.response?.data?.detail || err.message || 'Unable to delete transaction', 'error');
     }
   };
 
@@ -553,6 +576,14 @@ function Dashboard() {
         expenseToEdit={expenseToEdit}
         wallets={wallets}
       />
+
+      {toast.show && (
+        <div className={`toast-notification toast-${toast.type}`}>
+          <span className="toast-icon">{toast.type === 'error' ? '❌' : toast.type === 'success' ? '✅' : 'ℹ️'}</span>
+          <span className="toast-message">{toast.message}</span>
+          <button className="toast-close" onClick={() => setToast({ ...toast, show: false })}>✕</button>
+        </div>
+      )}
     </>
   );
 }
