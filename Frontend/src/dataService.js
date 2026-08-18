@@ -61,9 +61,10 @@ const ensureLocalWallets = (userId) => {
 export const dataService = {
   login: async (email, password) => {
     const mode = getStorageMode();
+    const normalizedEmail = email.toLowerCase();
     if (mode === 'local') {
       const users = getLocalUsers();
-      const user = users[email];
+      const user = users[normalizedEmail];
       if (!user || user.password !== password) {
         throw new Error('Invalid email or password');
       }
@@ -72,29 +73,31 @@ export const dataService = {
       return userOut;
     } else {
       // Connect to API
-      const res = await api.post('/login', { email, password });
+      const res = await api.post('/login', { email: normalizedEmail, password });
       return res.data;
     }
   },
 
   register: async (name, email, password) => {
     const mode = getStorageMode();
+    const normalizedEmail = email.toLowerCase();
     if (mode === 'local') {
       const users = getLocalUsers();
-      if (users[email]) {
+      if (users[normalizedEmail]) {
         throw new Error('Email already registered');
       }
       const newId = Object.keys(users).length + 1;
-      const newUser = { id: newId, name, email, password };
-      users[email] = newUser;
+      const newUser = { id: newId, name, email: normalizedEmail, password };
+      users[normalizedEmail] = newUser;
       saveLocalUsers(users);
       const { password: _, ...userOut } = newUser;
       return userOut;
     } else {
-      const res = await api.post('/register', { name, email, password });
+      const res = await api.post('/register', { name, email: normalizedEmail, password });
       return res.data;
     }
   },
+
 
   getExpenses: async (userId) => {
     const mode = getStorageMode();
@@ -221,6 +224,17 @@ export const dataService = {
       return { detail: 'Expense deleted' };
     } else {
       const res = await api.delete(`/expenses/${expenseId}`);
+      return res.data;
+    }
+  },
+
+  updateBudget: async (userId, budgetLimit) => {
+    const mode = getStorageMode();
+    if (mode === 'local') {
+      localStorage.setItem(`budget_limit_${userId}`, budgetLimit.toString());
+      return { budget_limit: budgetLimit };
+    } else {
+      const res = await api.put('/users/me/budget', { budget_limit: budgetLimit });
       return res.data;
     }
   },

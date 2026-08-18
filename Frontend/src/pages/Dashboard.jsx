@@ -63,11 +63,14 @@ function Dashboard() {
       fetchTransactions(parsedUser.id);
       fetchWallets(parsedUser.id);
 
-      // Load budget limit
+      // Load budget limit: check local storage first, then fall back to backend-persisted budget limit
       const storedBudget = localStorage.getItem(`budget_limit_${parsedUser.id}`);
       if (storedBudget) {
         setBudgetLimit(parseFloat(storedBudget));
         setBudgetInput(storedBudget);
+      } else if (parsedUser.budget_limit !== undefined) {
+        setBudgetLimit(parsedUser.budget_limit);
+        setBudgetInput(parsedUser.budget_limit.toString());
       }
     }
   }, [navigate]);
@@ -201,12 +204,23 @@ function Dashboard() {
     });
   };
 
-  const saveBudget = () => {
+  const saveBudget = async () => {
     const parsedLimit = parseFloat(budgetInput);
     if (!isNaN(parsedLimit) && parsedLimit >= 0) {
-      localStorage.setItem(`budget_limit_${user.id}`, parsedLimit.toString());
-      setBudgetLimit(parsedLimit);
-      setIsEditingBudget(false);
+      try {
+        await dataService.updateBudget(user.id, parsedLimit);
+        // Sync the updated budget limit back into the user object stored locally
+        const updatedUser = { ...user, budget_limit: parsedLimit };
+        setUser(updatedUser);
+        localStorage.setItem('user', JSON.stringify(updatedUser));
+        localStorage.setItem(`budget_limit_${user.id}`, parsedLimit.toString());
+        setBudgetLimit(parsedLimit);
+        setIsEditingBudget(false);
+        showToast('Budget updated successfully!', 'success');
+      } catch (err) {
+        console.error('Error saving budget', err);
+        showToast(err.response?.data?.detail || err.message || 'Unable to update budget', 'error');
+      }
     }
   };
 

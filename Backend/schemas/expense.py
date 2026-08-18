@@ -1,12 +1,12 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from datetime import date
-from typing import Optional
+from typing import Optional, Literal
 
 class ExpenseBase(BaseModel):
-    title: str
-    amount: float
-    category: str
-    type: str
+    title: str = Field(..., min_length=1)
+    amount: float = Field(..., gt=0)
+    category: str = Field(..., min_length=1)
+    type: Literal["Income", "Expense"]
     date: date
     wallet: str = 'Main Wallet'
 
@@ -14,10 +14,10 @@ class ExpenseCreate(ExpenseBase):
     user_id: int
 
 class ExpenseUpdate(BaseModel):
-    title: Optional[str] = None
-    amount: Optional[float] = None
-    category: Optional[str] = None
-    type: Optional[str] = None
+    title: Optional[str] = Field(None, min_length=1)
+    amount: Optional[float] = Field(None, gt=0)
+    category: Optional[str] = Field(None, min_length=1)
+    type: Optional[Literal["Income", "Expense"]] = None
     date: Optional[date] = None
     wallet: Optional[str] = None
 

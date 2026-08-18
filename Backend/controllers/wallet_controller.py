@@ -16,13 +16,23 @@ def create_wallet(wallet: WalletCreate):
     return wallet_dict
 
 def get_wallet_by_name(user_id: int, wallet_name: str):
-    return db["wallets"].find_one({"user_id": user_id, "wallet": wallet_name}, {"_id": 0})
+    import re
+    return db["wallets"].find_one({
+        "user_id": user_id,
+        "wallet": {"$regex": f"^{re.escape(wallet_name)}$", "$options": "i"}
+    }, {"_id": 0})
 
 def delete_wallet(user_id: int, wallet_name: str):
-    if wallet_name == 'Main Wallet':
+    if wallet_name.lower() == 'main wallet':
         return False
-    result = db["wallets"].delete_one({"user_id": user_id, "wallet": wallet_name})
+    wallet = get_wallet_by_name(user_id, wallet_name)
+    if not wallet:
+        return False
+    # Use the exact casing stored in database
+    actual_name = wallet["wallet"]
+    result = db["wallets"].delete_one({"user_id": user_id, "wallet": actual_name})
     if result.deleted_count > 0:
-        db["expenses"].delete_many({"user_id": user_id, "wallet": wallet_name})
+        db["expenses"].delete_many({"user_id": user_id, "wallet": actual_name})
         return True
     return False
+
