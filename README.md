@@ -1,6 +1,6 @@
 # Personal Expense Tracker 🚀
 
-A modern, full-stack web application to help individuals track daily income and expenses. Built with a premium **Glassmorphism UI** on the frontend and a scalable **MVC-structured Python backend** backed by a cloud **MongoDB Atlas** database.
+A modern, full-stack web application to help individuals track daily income and expenses. Built with a premium **Glassmorphism UI** on the frontend and a scalable, secure **MVC-structured Python backend** backed by a cloud **MongoDB Atlas** database.
 
 ---
 
@@ -12,13 +12,14 @@ A modern, full-stack web application to help individuals track daily income and 
 ---
 
 ## 🎨 Features
-- **Secure User Authentication** — Register & Login with `bcrypt` hashed passwords. Route-protected UI with `localStorage` session persistence.
+- **Secure JWT Authentication & Route Guards** — Register & Login with `bcrypt` password hashing. Server-side endpoint protection using signed JWT tokens. Email casing normalization (lowercase transformation) and password length rules are enforced.
+- **Auto Session Expiry Handling** — Axios request interceptors automatically inject Bearer tokens, and response interceptors intercept `401 Unauthorized` errors to safely log users out.
 - **Dynamic Glassmorphism UI** — Premium layered gradients and blur effects built with React & CSS.
-- **Full Expense CRUD** — Add, Edit, and Delete income/expense transactions with instant UI feedback.
+- **Full Expense CRUD** — Add, Edit, and Delete income/expense transactions with instant UI feedback and ownership verification.
+- **Persisted Budgets** — Budgets are persisted server-side in MongoDB, ensuring your financial limits are retained across devices and sessions.
 - **Dashboard Analytics** — Total balance, income & expense summaries with a Recharts Pie Chart for category-wise spending visualization.
-- **Budget Tracking** — Category budget progress bars to monitor spending limits.
+- **Wallet Management & Integrity** — Create and delete multiple wallets, backed by case-insensitive name uniqueness checks and cascading deletes.
 - **MongoDB NoSQL Storage** — Production-ready cloud document store via PyMongo + MongoDB Atlas. Atomic sequential IDs maintain full frontend compatibility.
- - **Wallet Management** — Create, rename, and delete multiple wallets; view per-wallet transactions and summaries.
 
 ---
 
@@ -29,19 +30,19 @@ A modern, full-stack web application to help individuals track daily income and 
 | **Visualization** | Recharts | Pie chart analytics |
 | **Backend** | Python 3.10+, FastAPI | REST API server |
 | **Server** | Gunicorn + Uvicorn | WSGI/ASGI production server |
-| **Database** | MongoDB Atlas (PyMongo) | NoSQL cloud document store |
-| **Auth** | passlib + bcrypt | Password hashing |
+| **Database** | MongoDB Atlas (PyMongo) | NoSQL cloud database |
+| **Auth & Security** | PyJWT, passlib + bcrypt | JWT creation, verification & hashing |
+| **Validation** | Pydantic v2 (email-validator) | Schema constraint enforcement |
+| **Testing** | pytest, httpx | Automated integration testing |
 | **Frontend Host** | Netlify | Auto-deploy from GitHub |
 | **Backend Host** | Render | Auto-deploy from GitHub |
 
 ---
 
 ## 🚀 Deployment Config
-- **Backend:** `render.yaml` blueprint configured for Render auto-deploy. Set `MONGO_URI` environment variable in Render dashboard to connect MongoDB Atlas.
+- **Backend:** `render.yaml` blueprint configured for Render auto-deploy. Set `MONGO_URI` and `JWT_SECRET` environment variables in Render dashboard.
 - **Frontend:** `netlify.toml` configured for Vite build from `Frontend/` directory with SPA redirect rules.
-- **CORS:** Configured to allow all origins for seamless cross-platform API access.
-
-
+- **CORS:** Explicit CORS configuration in `main.py` allowing local ports (`localhost:5173`) and dynamic domains via `ALLOWED_ORIGINS` env var (prevents invalid credential-wildcard pairing).
 
 ---
 
@@ -56,9 +57,9 @@ A modern, full-stack web application to help individuals track daily income and 
 ```bash
 cd Backend
 cp .env.example .env
-# Edit .env — set your MONGO_URI:
-# Local:  MONGO_URI=mongodb://localhost:27017/
-# Atlas:  MONGO_URI=mongodb+srv://<user>:<password>@cluster0.xxxxx.mongodb.net/expense_tracker
+# Edit .env — set your variables:
+# MONGO_URI=mongodb+srv://...
+# JWT_SECRET=your-secure-secret-key
 ```
 
 ### Step 2: Start the Backend
@@ -68,7 +69,13 @@ pip install -r requirements.txt
 uvicorn main:app --reload --port 8000
 ```
 
-### Step 3: Start the Frontend
+### Step 3: Run Automated Tests
+```bash
+cd Backend
+python -m pytest tests/
+```
+
+### Step 4: Start the Frontend
 ```bash
 cd Frontend
 npm install
@@ -83,13 +90,20 @@ npm run dev
 ├── Backend/                        # Python FastAPI Application (MVC)
 │   ├── controllers/                # Business Logic — MongoDB CRUD operations
 │   │   ├── expense_controller.py   # Expense CRUD via PyMongo
-│   │   └── user_controller.py      # User auth via PyMongo + bcrypt
-│   ├── routes/                     # HTTP Route Definitions
+│   │   ├── user_controller.py      # User auth & budget management
+│   │   └── wallet_controller.py    # Wallet management & cascading deletes
+│   ├── routes/                     # HTTP Route Definitions (JWT guarded)
 │   │   ├── expense_routes.py       # /expenses endpoints
-│   │   └── user_routes.py          # /register, /login endpoints
+│   │   ├── user_routes.py          # /register, /login, /users/me/budget endpoints
+│   │   └── wallet_routes.py        # /wallets endpoints
 │   ├── schemas/                    # Pydantic Request/Response Models
+│   ├── tests/                      # Automated test suite (pytest)
+│   │   ├── conftest.py             # Test db setup & client fixtures
+│   │   ├── test_auth.py            # Auth & budget unit/integration tests
+│   │   └── test_expenses.py        # Expense & wallet security tests
+│   ├── auth.py                     # JWT token signing & get_current_user dependency
 │   ├── database.py                 # PyMongo client & atomic ID sequence generator
-│   ├── main.py                     # FastAPI app root, CORS, dotenv loader
+│   ├── main.py                     # FastAPI app root, CORS, router loading
 │   ├── .env.example                # Environment variable template
 │   └── requirements.txt            # Python dependencies
 │
@@ -100,18 +114,12 @@ npm run dev
 │   │   │   ├── ExpenseModal.jsx    # Add/Edit transaction modal
 │   │   │   └── Navbar.jsx          # Navigation bar
 │   │   ├── pages/                  # Full Page Components
-│   │   │   ├── Dashboard.jsx       # Main analytics dashboard
+│   │   │   ├── Dashboard.jsx       # Main analytics dashboard & budget manager
 │   │   │   ├── Login.jsx           # Login page
 │   │   │   └── Register.jsx        # Registration page
-│   │   ├── api.js                  # Axios instance with backend URL config
-│   │   ├── dataService.js          # Dual-mode service (API / mock)
+│   │   ├── api.js                  # Axios instance with JWT interceptors
+│   │   ├── dataService.js          # Dual-mode service (API / local storage)
 │   │   └── index.css               # Premium Glassmorphism design system
-│
-├── Documentation/                  # Full project documentation
-│   ├── 1. Project Idea & Business Analysis Phase/
-│   ├── 2. Product Requirement Document/
-│   ├── 3. Software Requirements Specification (SRS)/
-│   └── 4. Technical Design Document (TDD)/
 │
 ├── render.yaml                     # Render Backend deployment blueprint
 ├── netlify.toml                    # Netlify Frontend deployment config
@@ -122,16 +130,20 @@ npm run dev
 
 ## 📡 API Endpoints
 
-| Method | Endpoint | Description |
-|---|---|---|
-| `POST` | `/register` | Create a new user account |
-| `POST` | `/login` | Authenticate and return user session |
-| `POST` | `/expenses` | Create a new transaction |
-| `GET` | `/expenses/{user_id}` | Get all transactions for a user |
-| `PUT` | `/expenses/{expense_id}` | Update a specific transaction |
-| `DELETE` | `/expenses/{expense_id}` | Delete a specific transaction |
+| Method | Endpoint | Description | Auth Required |
+|---|---|---|---|
+| `POST` | `/register` | Create a new user account | None |
+| `POST` | `/login` | Authenticate, sign, and return a JWT access token | None |
+| `PUT` | `/users/me/budget` | Update authenticated user's budget limit | JWT Bearer |
+| `POST` | `/expenses` | Create a new transaction | JWT Bearer |
+| `GET` | `/expenses/{user_id}` | Get all transactions for the authenticated user | JWT Bearer |
+| `PUT` | `/expenses/{expense_id}` | Update a specific owned transaction | JWT Bearer |
+| `DELETE` | `/expenses/{expense_id}` | Delete a specific owned transaction | JWT Bearer |
+| `POST` | `/wallets` | Create a new wallet | JWT Bearer |
+| `GET` | `/wallets/{user_id}` | Get wallets for a user | JWT Bearer |
+| `DELETE` | `/wallets/{user_id}/{wallet_name}` | Delete a wallet and its transactions | JWT Bearer |
 
-Full interactive docs available at `/docs` (Swagger UI).
+Full interactive documentation is available at `/docs` (Swagger UI).
 
 ---
 Developed by **Nujat11** 💻
